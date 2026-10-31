@@ -45,6 +45,7 @@ h1{font-size:64px;font-weight:700;letter-spacing:-1px}
 .btns{display:flex;gap:18px}
 .btn{border:5px solid #000;padding:14px 30px;font-size:36px;font-weight:700;min-width:300px;text-align:center}
 .hdr .right{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;height:140px}
+.body{height:2000px;overflow:hidden}
 .foot{position:absolute;bottom:60px;right:70px;font-size:28px;color:#888}
 /* daily */
 .grid{position:relative;height:1840px;border-top:3px solid #ccc}
@@ -97,7 +98,9 @@ def events_on(d, merge=True):
 
 def ev_line(e):
     t = "all day" if e.get("allday") else f'{e["start"]}–{e["endt"]}'
-    loc = f'<span class="loc">{html.escape(e["loc"])}</span>' if e.get("loc") else ""
+    l = e.get("loc") or ""
+    l = l if len(l) <= 28 else l[:27] + "…"
+    loc = f'<span class="loc">{html.escape(l)}</span>' if l else ""
     return f'<div class="ev {e["cal"]}"><span class="t">{t}</span>{mark(e)}<span>{html.escape(e["title"])}{loc}</span></div>'
 
 def hdr(title, sub, b1, b2):
@@ -116,7 +119,7 @@ def agenda(week=0):
         body += "</div>"
     title = "This week" if week == 0 else "Next week"
     sub = f'{start.strftime("%a %-d %b")} to {(start+dt.timedelta(6)).strftime("%a %-d %b")}'
-    return hdr(title, sub, "Month", "Next week &rsaquo;" if week == 0 else "&lsaquo; This week") + body + legend()
+    return hdr(title, sub, "Month", "Next week &rsaquo;" if week == 0 else "&lsaquo; This week") + f'<div class="body">{body}</div>' + legend()
 def agenda_next(): return agenda(1)
 
 def daily():
@@ -221,7 +224,7 @@ def priorities():
         cls = "dec" if title.startswith("Decisions") else ""
         body += f'<div class="sec {cls}"><h2>{title}</h2>' + "".join(
             f'<div class="pi"><span class="cb"></span><span>{html.escape(t)}</span><span class="due">{d}</span></div>' for t, d in items) + "</div>"
-    return f'<div class="hdr"><h1>Priorities</h1><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div>{body}'
+    return f'<div class="hdr"><h1>Priorities</h1><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div><div class="body">{body}</div>'
 
 def nav(cur):
     return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Kindle"]) + '</div>'
