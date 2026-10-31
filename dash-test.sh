@@ -13,6 +13,15 @@ echo "fw: $(cat /etc/version.txt 2>/dev/null | head -1)"
 echo "wget: $(which wget)  curl: $(which curl)"
 rm -f "$PNG"
 
+# 0. network diagnostics
+sleep 15   # give Wi-Fi time to reassociate after the tap
+echo "wifi: $(lipc-get-prop com.lab126.wifid cmState 2>/dev/null)"
+echo "resolv.conf: $(cat /etc/resolv.conf 2>/dev/null | tr '\n' ' ')"
+echo "hosts entries: $(wc -l < /etc/hosts 2>/dev/null)"
+ping -c 1 -W 3 1.1.1.1 >/dev/null 2>&1 && echo "ping 1.1.1.1: OK" || echo "ping 1.1.1.1: FAILED (no route/wifi)"
+ping -c 1 -W 3 github.com >/dev/null 2>&1 && echo "ping github.com: OK (DNS works)" || echo "ping github.com: FAILED (DNS)"
+nslookup raw.githubusercontent.com 2>&1 | tail -2
+
 # 1. fetch: try curl, then busybox wget (older busybox has no TLS)
 if which curl >/dev/null 2>&1; then
   curl -fsSL -o "$PNG" "$URL" && echo "fetch: curl OK" || echo "fetch: curl FAILED rc=$?"
