@@ -28,11 +28,15 @@ h1{font-size:64px;font-weight:700;letter-spacing:-1px}
 .adhoc .m{background:#fff}
 .ev .loc{color:#666;margin-left:14px}
 .empty{font-size:34px;color:#888;font-style:italic;padding:4px 0}
-.legend{position:absolute;bottom:60px;left:70px;right:70px;display:flex;gap:48px;font-size:30px;color:#444;border-top:3px solid #000;padding-top:16px}
+.legend{position:absolute;bottom:200px;left:70px;right:70px;display:flex;gap:48px;font-size:30px;color:#444;border-top:3px solid #000;padding-top:16px}
 .legend .m{margin-top:4px}
+.nav{position:absolute;left:0;right:0;bottom:0;height:150px;border-top:6px solid #000;display:flex}
+.nav div{flex:1;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;border-right:6px solid #000}
+.nav div:last-child{border-right:0}
+.nav .on{background:#000;color:#fff}
 .foot{position:absolute;bottom:60px;right:70px;font-size:28px;color:#888}
 /* daily */
-.grid{position:relative;height:1980px;border-top:3px solid #ccc}
+.grid{position:relative;height:1840px;border-top:3px solid #ccc}
 .hr{position:absolute;left:0;right:0;border-top:3px solid #ddd;font-size:30px;color:#777;padding-left:6px}
 .hr.now{border-top:6px solid #000}
 .blk{position:absolute;left:170px;right:20px;border:5px solid #000;padding:10px 18px;font-size:38px;background:#fff;overflow:hidden}
@@ -40,7 +44,7 @@ h1{font-size:64px;font-weight:700;letter-spacing:-1px}
 .blk .loc{font-size:30px;color:#444}
 .allday{font-size:36px;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:14px 40px}
 /* month */
-table{width:100%;height:2080px;border-collapse:collapse;table-layout:fixed}
+table{width:100%;height:1940px;border-collapse:collapse;table-layout:fixed}
 th{font-size:34px;padding:10px 0;border-bottom:5px solid #000}
 td{vertical-align:top;border:3px solid #bbb;padding:10px 12px;font-size:28px;line-height:1.3}
 td .n{font-size:40px;font-weight:700;margin-bottom:6px}
@@ -89,7 +93,7 @@ def agenda():
 def daily():
     evs = events_on(TODAY)
     allday = "".join(f'<span class="ev {e["cal"]}">{mark(e)}{html.escape(e["title"])}</span>' for e in evs if e.get("allday"))
-    H0, H1 = 7, 21; px = 1980 / (H1 - H0)
+    H0, H1 = 7, 21; px = 1840 / (H1 - H0)
     hrs = "".join(f'<div class="hr" style="top:{(h-H0)*px}px">{h:02d}:00</div>' for h in range(H0, H1))
     now = 10.4; hrs += f'<div class="hr now" style="top:{(now-H0)*px}px"></div>'
     blks = ""
@@ -105,7 +109,7 @@ def month():
     weeks = calendar.Calendar(firstweekday=0).monthdatescalendar(y, m)
     rows = ""
     for w in weeks:
-        rows += f'<tr style="height:{int(2080/len(weeks))}px">'
+        rows += f'<tr style="height:{int(1940/len(weeks))}px">'
         for d in w:
             cls = ("today" if d == TODAY else "") + (" other" if d.month != m else "")
             evs = events_on(d)
@@ -125,7 +129,7 @@ TFC = dict(paying=22, trial_live=6, trial_lapsed=30, active_1d=8, active_7d=22, 
                     ("Pricing page: remove 'rises 1 Nov' copy", "")])
 LOGO = (HERE / "tfc-logo.svg").read_text()
 CSS_TFC = """
-.col{display:flex;flex-direction:column;height:2360px}
+.col{display:flex;flex-direction:column;height:2220px}
 .col .grow{flex:1}
 .tile .v{font-size:150px}
 .brand{display:flex;align-items:center;gap:26px}
@@ -173,30 +177,15 @@ def tfc():
         f'<div class="box grow" style="margin-top:28px"><div class="l">Pricing to-do</div>{acts}</div></div>')
 def TOday(): return dt.date(2026, 10, 31)
 
-PRI = [
- ("This week", [
-   ("TFC: Stripe $72 promo + send 5 win-back messages", "Fri 7 Nov"),
-   ("Pre-op survey audit, last 20 surveys (30 min)", ""),
-   ("Handyman: send bundled list + photos, ask day rate", ""),
-   ("Gardener: quote lawn levelling, hedge, court edge", ""),
-   ("Kindle: run touch-test.sh, paste log", ""),
-   ("mysurgery FESS: get Dr Hasan's after-hours number", "")]),
- ("By end of November", [
-   ("Aircon: service or replace, then book", "late Nov"),
-   ("East Coast lap: Port Douglas vs mid-north coast", "Nov"),
-   ("Leah Year 7: orientation, uniform, device, transport trial", "Term 4"),
-   ("TFC: group offer to haz and Chengus", "6-8 Nov"),
-   ("TFC: fix trial expiry enforcement (30 lapsed)", ""),
-   ("Curtains: book measure-and-quote if replacing", "")]),
- ("December", [
-   ("El Nido wedding, Nathan + Leah (check it is booked)", "Thu 10 Dec"),
-   ("MUH Monday / EL Friday: last shift", "Mon 21 Dec"),
-   ("Perfusion: 40 runs by ~23 Feb; track W1 Tue pickups", "")]),
- ("Decisions, not tasks", [
-   ("House cleaning: deep clean or regular? (with Sarah)", ""),
-   ("Mercy Ships 2027: test placement, apply only, or not 2027", ""),
-   ("Which clinical day gets cut for the 4-day week", "")]),
-]
+def load_pri():
+    secs, cur = [], None
+    for line in (HERE.parent / "priorities.md").read_text().splitlines():
+        if line.startswith("## "):
+            cur = (line[3:].strip(), []); secs.append(cur)
+        elif line.startswith("- [ ] ") and cur:
+            t, _, due = line[6:].partition("|"); cur[1].append((t.strip(), due.strip()))
+    return secs
+PRI = load_pri()
 CSS_PRI = """
 .sec{margin-top:30px}
 .sec h2{font-size:44px;font-weight:700;border-bottom:4px solid #000;padding-bottom:8px;margin-bottom:12px}
@@ -214,11 +203,15 @@ def priorities():
             f'<div class="pi"><span class="cb"></span><span>{html.escape(t)}</span><span class="due">{d}</span></div>' for t, d in items) + "</div>"
     return f'<div class="hdr"><h1>Priorities</h1><span class="sub">from handoffs 23-31 Oct · updated 07:30</span></div>{body}'
 
+def nav(cur):
+    return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Kindle"]) + '</div>'
+
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(); pg = await b.new_page(viewport={"width": 1860, "height": 2480})
         for name, fn in [("agenda", agenda), ("daily", daily), ("month", month), ("tfc", tfc), ("priorities", priorities)]:
-            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}{CSS_PRI}</style></head><body>{fn()}</body></html>"
+            cur = {"agenda":"Agenda","daily":"Agenda","month":"Agenda","tfc":"TFC","priorities":"Priorities"}[name]
+            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}{CSS_PRI}</style></head><body>{fn()}{nav(cur)}</body></html>"
             (HERE / f"{name}.html").write_text(doc)
             await pg.set_content(doc); await pg.screenshot(path=str(HERE / f"{name}.png"))
             im = Image.open(HERE / f"{name}.png").convert("L").quantize(16).convert("L")
