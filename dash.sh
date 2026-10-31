@@ -1,5 +1,5 @@
 #!/bin/sh
-# kindle-dash v1.1. Tap this "book" to enter dashboard mode.
+# kindle-dash v1.2. Tap this "book" to enter dashboard mode.
 # Footer tabs: Agenda | TFC | Priorities | Kindle (exit). Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
 
@@ -57,13 +57,14 @@ leave() {
   sleep 2; eips -f
   exit 0
 }
-trap leave INT TERM
+trap leave INT TERM EXIT
 
 enter
 X=0; Y=0
+exec 3<$TOUCH    # open once; reopening per event drops events queued in between
 # read one 16-byte input event at a time: type code value
 while :; do
-  set -- $(dd if=$TOUCH bs=16 count=1 2>/dev/null | hexdump -v -e '2/4 "" 1/2 "%u " 1/2 "%u " 1/4 "%u\n"')
+  set -- $(dd bs=16 count=1 <&3 2>/dev/null | hexdump -v -e '2/4 "" 1/2 "%u " 1/2 "%u " 1/4 "%u\n"')
   [ "$1" = "3" ] || continue
   case "$2" in
     53) X=$3 ;;                       # ABS_MT_POSITION_X
