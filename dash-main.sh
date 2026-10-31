@@ -1,10 +1,10 @@
 #!/bin/sh
-# kindle-dash v1.7. Tap this "book" to enter dashboard mode.
+# kindle-dash v2.0. Tap this "book" to enter dashboard mode.
 # Footer tabs: Agenda | TFC | Priorities | Kindle (exit). Header buttons on calendar pages: [Month/Week] [Next/Back].
 # Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
 
-BASE="https://raw.githubusercontent.com/unborntimecap/kindle-dash/main/mock"
+BASE="https://raw.githubusercontent.com/unborntimecap/kindle-dash/render"
 PAGES="agenda agenda-next month month-next tfc priorities"
 REFRESH=1800
 D=/mnt/us
