@@ -1,5 +1,7 @@
 """Mockup renderer: events.json -> agenda/daily/month HTML -> 1860x2480 greyscale PNG."""
 import json, datetime as dt, calendar, html, asyncio
+from zoneinfo import ZoneInfo
+NOW = dt.datetime.now(ZoneInfo("Australia/Sydney")).strftime("%a %-d %b %H:%M")
 from pathlib import Path
 from playwright.async_api import async_playwright
 from PIL import Image
@@ -96,7 +98,7 @@ def agenda():
         body += f'<div class="day {"today" if i==0 else ""}"><h2>{lbl}<span>{d.strftime("%-d %b")}</span></h2>'
         body += "".join(ev_line(e) for e in evs) or '<div class="empty">nothing scheduled</div>'
         body += "</div>"
-    return f'<div class="hdr"><h1>This week</h1><span class="sub">{TODAY.strftime("%a %-d %b %Y")} · updated 07:30</span></div>{body}{legend()}'
+    return f'<div class="hdr"><h1>This week</h1><span class="sub">{TODAY.strftime("%a %-d %b %Y")} · rendered {NOW}</span></div>{body}{legend()}'
 
 def daily():
     evs = events_on(TODAY)
@@ -109,7 +111,7 @@ def daily():
         if e.get("allday"): continue
         s = int(e["start"][:2]) + int(e["start"][3:]) / 60; en = int(e["endt"][:2]) + int(e["endt"][3:]) / 60
         blks += f'<div class="blk {e["cal"]}" style="top:{(s-H0)*px+2}px;height:{(en-s)*px-6}px"><b>{e["start"]}</b> {html.escape(e["title"])}<div class="loc">{html.escape(e.get("loc",""))}</div></div>'
-    return (f'<div class="hdr"><h1>{TODAY.strftime("%A %-d %B")}</h1><span class="sub">updated 10:24</span></div>'
+    return (f'<div class="hdr"><h1>{TODAY.strftime("%A %-d %B")}</h1><span class="sub">rendered {NOW}</span></div>'
             f'<div class="allday">{allday}</div><div class="grid">{hrs}{blks}</div>{legend()}')
 
 def month():
@@ -125,7 +127,7 @@ def month():
             rows += f'<td class="{cls}"><div class="n">{d.day}</div>{lines}</td>'
         rows += "</tr>"
     head = "".join(f"<th>{n}</th>" for n in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])
-    return (f'<div class="hdr"><h1>{TODAY.strftime("%B %Y")}</h1><span class="sub">updated 07:30</span></div>'
+    return (f'<div class="hdr"><h1>{TODAY.strftime("%B %Y")}</h1><span class="sub">rendered {NOW}</span></div>'
             f'<table><tr>{head}</tr>{rows}</table>{legend()}')
 
 
@@ -168,7 +170,7 @@ def tfc():
     T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
     acts = "".join(f'<div class="li"><span class="cb"></span><span>{a}</span><span class="due">{d}</span></div>' for a, d in TFC["actions"])
     ends = "".join(f'<div class="li"><span>{n}</span><span class="due">{d}</span></div>' for n, d in TFC["ending"])
-    return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><span class="sub">updated 07:30</span></div>'
+    return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><span class="sub">rendered {NOW}</span></div>'
         f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{TFC["exam"].strftime("%a %-d %b")} · {TFC["exam_n"]} candidates</div></div>'
         '<div class="tiles">'
         + T(TFC["paying"], "paying", "subscriptions active")
@@ -209,7 +211,7 @@ def priorities():
         cls = "dec" if title.startswith("Decisions") else ""
         body += f'<div class="sec {cls}"><h2>{title}</h2>' + "".join(
             f'<div class="pi"><span class="cb"></span><span>{html.escape(t)}</span><span class="due">{d}</span></div>' for t, d in items) + "</div>"
-    return f'<div class="hdr"><h1>Priorities</h1><span class="sub">from handoffs 23-31 Oct · updated 07:30</span></div>{body}'
+    return f'<div class="hdr"><h1>Priorities</h1><span class="sub">from handoffs 23-31 Oct · rendered {NOW}</span></div>{body}'
 
 def nav(cur):
     return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Kindle"]) + '</div>'
