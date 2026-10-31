@@ -15,7 +15,7 @@ b=open('touch-raw.bin','rb').read()
 def tap(x,y):
     ev=lambda t,c,v: struct.pack('<IIHHi',0,0,t,c,v)
     return ev(3,0x39,0)+ev(3,0x35,x)+ev(3,0x36,y)+ev(0,0,0)+ev(3,0x39,-1)+ev(0,0,0)
-open(f'{T}/touch.bin','wb').write(b+tap(700,2400)+tap(1100,2400)+tap(1600,2400))
+open(f'{T}/touch.bin','wb').write(b+tap(1600,100)+tap(1200,100)+tap(1600,100)+tap(1200,100)+tap(700,2400)+tap(1100,2400)+tap(1600,2400))
 s=open('../dash-main.sh').read().replace('ping -c1 -W2 1.1.1.1','true').replace('D=/mnt/us',f'D={T}/mnt/us').replace('TOUCH=/dev/input/event4',f'TOUCH={T}/touch.bin')
 open(f'{T}/dash.sh','w').write(s)
 PY

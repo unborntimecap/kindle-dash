@@ -1,10 +1,11 @@
 #!/bin/sh
-# kindle-dash v1.4. Tap this "book" to enter dashboard mode.
-# Footer tabs: Agenda | TFC | Priorities | Kindle (exit). Tap anywhere else to refresh.
+# kindle-dash v1.5. Tap this "book" to enter dashboard mode.
+# Footer tabs: Agenda | TFC | Priorities | Kindle (exit). Header buttons on calendar pages: [Month/Week] [Next/Back].
+# Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
 
 BASE="https://raw.githubusercontent.com/unborntimecap/kindle-dash/main/mock"
-PAGES="agenda tfc priorities"
+PAGES="agenda agenda-next month month-next tfc priorities"
 REFRESH=1800
 D=/mnt/us
 LOG=$D/documents/dash-log.txt
@@ -79,6 +80,15 @@ while :; do
           elif [ $X -lt 930 ];  then show tfc
           elif [ $X -lt 1395 ]; then show priorities
           else leave; fi
+        elif [ $Y -lt 190 ] && [ $X -gt 1080 ]; then
+          # header buttons on calendar pages: left = Month/Week toggle, right = Next/Back toggle
+          case "$PAGE" in
+            agenda)      [ $X -gt 1450 ] && show agenda-next || show month ;;
+            agenda-next) [ $X -gt 1450 ] && show agenda      || show month ;;
+            month)       [ $X -gt 1450 ] && show month-next  || show agenda ;;
+            month-next)  [ $X -gt 1450 ] && show month       || show agenda ;;
+            *) fetch $PAGE; show $PAGE ;;
+          esac
         else
           fetch $PAGE; show $PAGE
         fi ;;
