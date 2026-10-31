@@ -55,8 +55,19 @@ def legend(): return ('<div class="legend"><span class="ev work"><span class="m"
                       '<span class="ev hos"><span class="m"></span>HosPortal</span>'
                       '<span class="ev adhoc"><span class="m"></span>Adhoc</span></div>')
 
-def events_on(d):
-    out = [e for e in EV if e["d"] == d or (e.get("end") and e["d"] <= d < dt.date.fromisoformat(e["end"]))]
+def events_on(d, merge=True):
+    out = [dict(e) for e in EV if e["d"] == d or (e.get("end") and e["d"] <= d < dt.date.fromisoformat(e["end"]))]
+    if merge:
+        work = [e for e in out if e["cal"] == "work"]
+        hos_alloc = [e for e in out if e["cal"] == "hos" and not e.get("allday")]
+        if work and hos_alloc:
+            first = min(hos_alloc, key=lambda e: e["start"])
+            for w in work:
+                w["allday"] = False; w["start"] = first["start"]; w["endt"] = max(hos_alloc, key=lambda e: e["endt"])["endt"]
+                w["loc"] = first.get("loc", "")
+            out = [e for e in out if e not in hos_alloc]
+        elif hos_alloc and not work:
+            for e in hos_alloc: e["title"] = "! " + e["title"]
     return sorted(out, key=lambda e: (not e.get("allday"), e.get("start", "")))
 
 def ev_line(e):
@@ -105,11 +116,49 @@ def month():
     return (f'<div class="hdr"><h1>{TODAY.strftime("%B %Y")}</h1><span class="sub">updated 07:30</span></div>'
             f'<table><tr>{head}</tr>{rows}</table>{legend()}')
 
+
+TFC = dict(paying=22, trial_live=6, trial_lapsed=30, active_1d=8, active_7d=22, signups_7d=1,
+           flags=9, requests=0, exam=dt.date(2026, 11, 5), exam_n=7, series=[7,11,8,10,9,9,9,8,14,13,7,6,6,6])
+CSS_TFC = """
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:10px}
+.tile{border:5px solid #000;padding:26px 30px;min-height:300px}
+.tile .v{font-size:120px;font-weight:700;line-height:1;letter-spacing:-3px}
+.tile .l{font-size:34px;color:#333;margin-top:14px}
+.tile .s{font-size:28px;color:#666;margin-top:6px}
+.tile.warn{background:repeating-linear-gradient(45deg,#fff 0 10px,#eee 10px 20px)}
+.hero{border:6px solid #000;background:#000;color:#fff;padding:40px 48px;display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.hero .v{font-size:170px;font-weight:700;line-height:1;letter-spacing:-4px}
+.hero .l{font-size:40px;text-align:right;line-height:1.3}
+.chart{border:5px solid #000;padding:26px 30px;margin-top:28px}
+.chart .l{font-size:34px;color:#333;margin-bottom:12px}
+.bars{display:flex;align-items:flex-end;gap:14px;height:260px}
+.bars div{flex:1;background:#000}
+.bars .x{font-size:26px;color:#666;display:flex;justify-content:space-between;margin-top:8px}
+"""
+def tfc():
+    days = (TFC["exam"] - TOday()).days
+    mx = max(TFC["series"])
+    bars = "".join(f'<div style="height:{v/mx*100}%"></div>' for v in TFC["series"])
+    T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
+    return (f'<div class="hdr"><h1>TFC</h1><span class="sub">updated 07:30</span></div>'
+        f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{TFC["exam"].strftime("%a %-d %b")} · {TFC["exam_n"]} candidates</div></div>'
+        '<div class="tiles">'
+        + T(TFC["paying"], "paying", "subscriptions active")
+        + T(TFC["trial_live"], "live trials", f'{TFC["trial_lapsed"]} lapsed, never converted')
+        + T(TFC["signups_7d"], "signups", "last 7 days")
+        + T(f'{TFC["active_1d"]}<span style="font-size:60px;color:#666"> / {TFC["active_7d"]}</span>', "active users", "today / 7 days")
+        + T(TFC["flags"], "open SAQ flags", "user-reported errors", "warn" if TFC["flags"] else "")
+        + T(TFC["requests"], "feature requests", "open")
+        + '</div>'
+        f'<div class="chart"><div class="l">Daily active users, last 14 days</div><div class="bars">{bars}</div>'
+        f'<div class="x"><span>{(TOday()-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>')
+def TOday(): return dt.date(2026, 10, 31)
+
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(); pg = await b.new_page(viewport={"width": 1860, "height": 2480})
-        for name, fn in [("agenda", agenda), ("daily", daily), ("month", month)]:
-            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}</style></head><body>{fn()}</body></html>"
+        for name, fn in [("agenda", agenda), ("daily", daily), ("month", month), ("tfc", tfc)]:
+            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}</style></head><body>{fn()}</body></html>"
             (HERE / f"{name}.html").write_text(doc)
             await pg.set_content(doc); await pg.screenshot(path=str(HERE / f"{name}.png"))
             im = Image.open(HERE / f"{name}.png").convert("L").quantize(16).convert("L")
