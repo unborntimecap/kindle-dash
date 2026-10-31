@@ -1,5 +1,5 @@
 #!/bin/sh
-# kindle-dash v1. Tap this "book" to enter dashboard mode.
+# kindle-dash v1.1. Tap this "book" to enter dashboard mode.
 # Footer tabs: Agenda | TFC | Priorities | Kindle (exit). Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
 
@@ -10,6 +10,7 @@ D=/mnt/us
 LOG=$D/documents/dash-log.txt
 TOUCH=/dev/input/event4
 PAGE=agenda
+exec >>$LOG 2>&1   # keep eips/curl chatter off the screen
 
 log() { echo "$(date '+%H:%M:%S') $*" >> $LOG; }
 
