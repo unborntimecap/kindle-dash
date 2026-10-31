@@ -83,7 +83,8 @@ def events_on(d, merge=True):
         hos_alloc = [e for e in out if e["cal"] == "hos" and not e.get("allday")]
         hos_hosps = {hosp(e["title"]) for e in hos_alloc}
         # "own" entries: Regular work, or an all-day Adhoc entry naming the same hospital as a HosPortal allocation
-        work = [e for e in out if e["cal"] == "work" or (e["cal"] == "adhoc" and e.get("allday") and hosp(e["title"]) in hos_hosps)]
+        work = [e for e in out if e["cal"] == "work" or (e["cal"] == "adhoc" and e.get("allday")
+                and "O/C" not in e["title"].upper() and hosp(e["title"]) in hos_hosps)]
         if work and hos_alloc:
             first = min(hos_alloc, key=lambda e: e["start"])
             for w in work:
