@@ -5,7 +5,7 @@ from playwright.async_api import async_playwright
 from PIL import Image
 
 HERE = Path(__file__).parent
-TODAY = dt.date(2026, 11, 3)  # pretend it's a busy Tuesday so the mock has content
+TODAY = dt.date.today()  # real date; the live renderer does the same
 EV = json.loads((HERE / "events.json").read_text())
 for e in EV:
     e["d"] = dt.date.fromisoformat(e["date"])
@@ -61,7 +61,15 @@ def legend(): return ('<div class="legend"><span class="ev work"><span class="m"
 
 def events_on(d, merge=True):
     out = [dict(e) for e in EV if e["d"] == d or (e.get("end") and e["d"] <= d < dt.date.fromisoformat(e["end"]))]
+    hide = [l.strip().lower() for l in (HERE.parent / "hide.txt").read_text().splitlines() if l.strip() and not l.startswith("#")]
+    out = [e for e in out if not any(h in e["title"].lower() for h in hide)]
     if merge:
+        # HosPortal on-call duplicates an Adhoc "O/C" entry for the same hospital that day
+        def hosp(t):
+            t = t.upper()
+            return "POW" if "POW" in t or "PRINCE OF WALES" in t else "RPA" if "RPA" in t or "PRINCE ALFRED" in t else None
+        oc = {hosp(e["title"]) for e in out if e["cal"] == "adhoc" and "O/C" in e["title"].upper()}
+        out = [e for e in out if not (e["cal"] == "hos" and e["title"].startswith("Call") and hosp(e["title"]) in oc)]
         work = [e for e in out if e["cal"] == "work"]
         hos_alloc = [e for e in out if e["cal"] == "hos" and not e.get("allday")]
         if work and hos_alloc:
@@ -174,7 +182,7 @@ def tfc():
         f'<div class="x"><span>{(TOday()-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>'
         f'<div class="box"><div class="l">Trials ending this fortnight</div>{ends}</div></div>'
         f'<div class="box grow" style="margin-top:28px"><div class="l">Pricing to-do</div>{acts}</div></div>')
-def TOday(): return dt.date(2026, 10, 31)
+def TOday(): return dt.date.today()
 
 def load_pri():
     secs, cur = [], None
