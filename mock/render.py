@@ -118,47 +118,107 @@ def month():
 
 
 TFC = dict(paying=22, trial_live=6, trial_lapsed=30, active_1d=8, active_7d=22, signups_7d=1,
-           flags=9, requests=0, exam=dt.date(2026, 11, 5), exam_n=7, series=[7,11,8,10,9,9,9,8,14,13,7,6,6,6])
+           flags=9, requests=0, exam=dt.date(2026, 11, 5), exam_n=7, series=[7,11,8,10,9,9,9,8,14,13,7,6,6,6],
+           ending=[("haz", "10 Nov"), ("Chengus", "12 Nov")],
+           actions=[("Stripe $72 promo code, expires 7 Nov", "Fri 7 Nov"), ("Send $72 win-back: Spencer, Harshil, Praba, dm, Hayden", "Fri 7 Nov"),
+                    ("Fix trial expiry: 30 lapsed trials still status=trialing", "now"), ("Group offer to haz, Chengus", "6-8 Nov"),
+                    ("Pricing page: remove 'rises 1 Nov' copy", "")])
+LOGO = (HERE / "tfc-logo.svg").read_text()
 CSS_TFC = """
-.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:10px}
-.tile{border:5px solid #000;padding:26px 30px;min-height:300px}
-.tile .v{font-size:120px;font-weight:700;line-height:1;letter-spacing:-3px}
-.tile .l{font-size:34px;color:#333;margin-top:14px}
+.col{display:flex;flex-direction:column;height:2360px}
+.col .grow{flex:1}
+.tile .v{font-size:150px}
+.brand{display:flex;align-items:center;gap:26px}
+.brand svg{width:96px;height:96px}
+.brand .w{font-size:46px;font-weight:700;letter-spacing:6px}
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:28px}
+.tile{border:5px solid #000;padding:36px 30px 30px}
+.tile .v{font-size:130px;font-weight:700;line-height:1;letter-spacing:-3px}
+.tile .l{font-size:36px;color:#222;margin-top:16px}
 .tile .s{font-size:28px;color:#666;margin-top:6px}
 .tile.warn{background:repeating-linear-gradient(45deg,#fff 0 10px,#eee 10px 20px)}
-.hero{border:6px solid #000;background:#000;color:#fff;padding:40px 48px;display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
-.hero .v{font-size:170px;font-weight:700;line-height:1;letter-spacing:-4px}
-.hero .l{font-size:40px;text-align:right;line-height:1.3}
-.chart{border:5px solid #000;padding:26px 30px;margin-top:28px}
-.chart .l{font-size:34px;color:#333;margin-bottom:12px}
-.bars{display:flex;align-items:flex-end;gap:14px;height:260px}
+.hero{border:6px solid #000;background:#000;color:#fff;padding:36px 48px;display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.hero .v{font-size:190px;font-weight:700;line-height:1;letter-spacing:-5px}
+.hero .l{font-size:42px;text-align:right;line-height:1.3}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px}
+.box{border:5px solid #000;padding:26px 30px}
+.box .l{font-size:34px;font-weight:700;margin-bottom:14px}
+.bars{display:flex;align-items:flex-end;gap:12px;height:340px}
 .bars div{flex:1;background:#000}
-.bars .x{font-size:26px;color:#666;display:flex;justify-content:space-between;margin-top:8px}
+.x{font-size:26px;color:#666;display:flex;justify-content:space-between;margin-top:8px}
+.li{font-size:34px;line-height:1.5;display:flex;gap:16px}
+.li .cb{width:34px;height:34px;border:4px solid #000;flex:none;margin-top:12px}
+.li .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
 """
 def tfc():
     days = (TFC["exam"] - TOday()).days
     mx = max(TFC["series"])
     bars = "".join(f'<div style="height:{v/mx*100}%"></div>' for v in TFC["series"])
     T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
-    return (f'<div class="hdr"><h1>TFC</h1><span class="sub">updated 07:30</span></div>'
+    acts = "".join(f'<div class="li"><span class="cb"></span><span>{a}</span><span class="due">{d}</span></div>' for a, d in TFC["actions"])
+    ends = "".join(f'<div class="li"><span>{n}</span><span class="due">{d}</span></div>' for n, d in TFC["ending"])
+    return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><span class="sub">updated 07:30</span></div>'
         f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{TFC["exam"].strftime("%a %-d %b")} · {TFC["exam_n"]} candidates</div></div>'
         '<div class="tiles">'
         + T(TFC["paying"], "paying", "subscriptions active")
         + T(TFC["trial_live"], "live trials", f'{TFC["trial_lapsed"]} lapsed, never converted')
         + T(TFC["signups_7d"], "signups", "last 7 days")
-        + T(f'{TFC["active_1d"]}<span style="font-size:60px;color:#666"> / {TFC["active_7d"]}</span>', "active users", "today / 7 days")
+        + T(f'{TFC["active_1d"]}<span style="font-size:64px;color:#666"> / {TFC["active_7d"]}</span>', "active users", "today / 7 days")
         + T(TFC["flags"], "open SAQ flags", "user-reported errors", "warn" if TFC["flags"] else "")
         + T(TFC["requests"], "feature requests", "open")
         + '</div>'
-        f'<div class="chart"><div class="l">Daily active users, last 14 days</div><div class="bars">{bars}</div>'
-        f'<div class="x"><span>{(TOday()-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>')
+        f'<div class="row2"><div class="box"><div class="l">Daily active users, 14 days</div><div class="bars">{bars}</div>'
+        f'<div class="x"><span>{(TOday()-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>'
+        f'<div class="box"><div class="l">Trials ending this fortnight</div>{ends}</div></div>'
+        f'<div class="box grow" style="margin-top:28px"><div class="l">Pricing to-do</div>{acts}</div></div>')
 def TOday(): return dt.date(2026, 10, 31)
+
+PRI = [
+ ("This week", [
+   ("TFC: Stripe $72 promo + send 5 win-back messages", "Fri 7 Nov"),
+   ("Pre-op survey audit, last 20 surveys (30 min)", ""),
+   ("Handyman: send bundled list + photos, ask day rate", ""),
+   ("Gardener: quote lawn levelling, hedge, court edge", ""),
+   ("Kindle: run touch-test.sh, paste log", ""),
+   ("mysurgery FESS: get Dr Hasan's after-hours number", "")]),
+ ("By end of November", [
+   ("Aircon: service or replace, then book", "late Nov"),
+   ("East Coast lap: Port Douglas vs mid-north coast", "Nov"),
+   ("Leah Year 7: orientation, uniform, device, transport trial", "Term 4"),
+   ("TFC: group offer to haz and Chengus", "6-8 Nov"),
+   ("TFC: fix trial expiry enforcement (30 lapsed)", ""),
+   ("Curtains: book measure-and-quote if replacing", "")]),
+ ("December", [
+   ("El Nido wedding, Nathan + Leah (check it is booked)", "Thu 10 Dec"),
+   ("MUH Monday / EL Friday: last shift", "Mon 21 Dec"),
+   ("Perfusion: 40 runs by ~23 Feb; track W1 Tue pickups", "")]),
+ ("Decisions, not tasks", [
+   ("House cleaning: deep clean or regular? (with Sarah)", ""),
+   ("Mercy Ships 2027: test placement, apply only, or not 2027", ""),
+   ("Which clinical day gets cut for the 4-day week", "")]),
+]
+CSS_PRI = """
+.sec{margin-top:30px}
+.sec h2{font-size:44px;font-weight:700;border-bottom:4px solid #000;padding-bottom:8px;margin-bottom:12px}
+.sec.dec h2{border-bottom-style:dashed;color:#444}
+.pi{font-size:36px;line-height:1.45;display:flex;gap:18px;padding:8px 0}
+.pi .cb{width:36px;height:36px;border:4px solid #000;flex:none;margin-top:12px}
+.sec.dec .pi .cb{border-radius:50%}
+.pi .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
+"""
+def priorities():
+    body = ""
+    for title, items in PRI:
+        cls = "dec" if title.startswith("Decisions") else ""
+        body += f'<div class="sec {cls}"><h2>{title}</h2>' + "".join(
+            f'<div class="pi"><span class="cb"></span><span>{html.escape(t)}</span><span class="due">{d}</span></div>' for t, d in items) + "</div>"
+    return f'<div class="hdr"><h1>Priorities</h1><span class="sub">from handoffs 23-31 Oct · updated 07:30</span></div>{body}'
 
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(); pg = await b.new_page(viewport={"width": 1860, "height": 2480})
-        for name, fn in [("agenda", agenda), ("daily", daily), ("month", month), ("tfc", tfc)]:
-            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}</style></head><body>{fn()}</body></html>"
+        for name, fn in [("agenda", agenda), ("daily", daily), ("month", month), ("tfc", tfc), ("priorities", priorities)]:
+            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}{CSS_PRI}</style></head><body>{fn()}</body></html>"
             (HERE / f"{name}.html").write_text(doc)
             await pg.set_content(doc); await pg.screenshot(path=str(HERE / f"{name}.png"))
             im = Image.open(HERE / f"{name}.png").convert("L").quantize(16).convert("L")
