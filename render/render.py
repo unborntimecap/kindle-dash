@@ -184,7 +184,7 @@ CSS_TFC = """
 .li .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
 """
 def tfc():
-    TFC["actions"] = dict(PRI).get("TFC", [])
+    TFC["actions"] = dict(PRI).get("TFC") or dict(sources.repo_priorities()).get("TFC", [])
     days = (TFC["exam"] - TODAY).days if TFC["exam"] else "–"
     exam_txt = f'{TFC["exam"].strftime("%a %-d %b")} · {TFC["exam_n"]} candidates' if TFC["exam"] else "no sitting scheduled"
     mx = max(TFC["series"]) or 1

@@ -106,6 +106,9 @@ def priorities():
         if cur[1]: secs.append(cur)
         if secs: return secs
     print("[warn] vault note unavailable or empty, using priorities.md")
+    return repo_priorities()
+
+def repo_priorities():
     secs, cur = [], None
     for line in (ROOT / "priorities.md").read_text().splitlines():
         if line.startswith("## "):
