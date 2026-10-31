@@ -1,0 +1,79 @@
+<!doctype html><html><head><meta charset=utf-8><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1860px;height:2480px;background:#fff;color:#000;font-family:'DejaVu Sans',Helvetica,Arial,sans-serif;padding:60px 70px;overflow:hidden}
+h1{font-size:64px;font-weight:700;letter-spacing:-1px}
+.hdr{display:flex;justify-content:space-between;align-items:baseline;border-bottom:6px solid #000;padding-bottom:18px;margin-bottom:30px}
+.hdr .sub{font-size:34px;color:#555}
+.day{margin-bottom:26px;padding-left:24px;border-left:8px solid #fff}
+.day.today{border-left-color:#000}
+.day h2{font-size:42px;font-weight:700;margin-bottom:8px}
+.day h2 span{font-weight:400;color:#555;font-size:34px;margin-left:16px}
+.ev{display:flex;font-size:36px;line-height:1.35;padding:4px 0 4px 0}
+.ev .t{width:230px;flex:none;color:#333;font-variant-numeric:tabular-nums}
+.ev .m{width:34px;height:34px;flex:none;margin:8px 18px 0 0;border:4px solid #000}
+.work .m{background:#000}
+.hos .m{background:repeating-linear-gradient(45deg,#000 0 4px,#fff 4px 8px)}
+.adhoc .m{background:#fff}
+.ev .loc{color:#666;margin-left:14px}
+.empty{font-size:34px;color:#888;font-style:italic;padding:4px 0}
+.legend{position:absolute;bottom:200px;left:70px;right:70px;display:flex;gap:48px;font-size:30px;color:#444;border-top:3px solid #000;padding-top:16px}
+.legend .m{margin-top:4px}
+.nav{position:absolute;left:0;right:0;bottom:0;height:150px;border-top:6px solid #000;display:flex}
+.nav div{flex:1;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;border-right:6px solid #000}
+.nav div:last-child{border-right:0}
+.nav .on{background:#000;color:#fff}
+.btns{display:flex;gap:18px}
+.btn{border:5px solid #000;padding:14px 30px;font-size:36px;font-weight:700;min-width:300px;text-align:center}
+.hdr .right{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.foot{position:absolute;bottom:60px;right:70px;font-size:28px;color:#888}
+/* daily */
+.grid{position:relative;height:1840px;border-top:3px solid #ccc}
+.hr{position:absolute;left:0;right:0;border-top:3px solid #ddd;font-size:30px;color:#777;padding-left:6px}
+.hr.now{border-top:6px solid #000}
+.blk{position:absolute;left:170px;right:20px;border:5px solid #000;padding:10px 18px;font-size:38px;background:#fff;overflow:hidden}
+.blk.hos{background:repeating-linear-gradient(45deg,#fff 0 10px,#e6e6e6 10px 20px)}
+.blk .loc{font-size:30px;color:#444}
+.allday{font-size:36px;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:14px 40px}
+/* month */
+table{width:100%;height:1820px;border-collapse:collapse;table-layout:fixed}
+th{font-size:34px;padding:10px 0;border-bottom:5px solid #000}
+td{vertical-align:top;border:3px solid #bbb;padding:10px 12px;font-size:28px;line-height:1.3}
+td .n{font-size:40px;font-weight:700;margin-bottom:6px}
+td.today{border:8px solid #000}
+td.other .n{color:#aaa}
+td .e{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
+td .m{width:20px;height:20px;border:3px solid #000;margin:0 10px 0 0;flex:none}
+
+.col{display:flex;flex-direction:column;height:2220px}
+.col .grow{flex:1}
+.tile .v{font-size:150px}
+.brand{display:flex;align-items:center;gap:26px}
+.brand svg{width:96px;height:96px}
+.brand .w{font-size:46px;font-weight:700;letter-spacing:6px}
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:28px}
+.tile{border:5px solid #000;padding:36px 30px 30px}
+.tile .v{font-size:130px;font-weight:700;line-height:1;letter-spacing:-3px}
+.tile .l{font-size:36px;color:#222;margin-top:16px}
+.tile .s{font-size:28px;color:#666;margin-top:6px}
+.tile.warn{background:repeating-linear-gradient(45deg,#fff 0 10px,#eee 10px 20px)}
+.hero{border:6px solid #000;background:#000;color:#fff;padding:36px 48px;display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.hero .v{font-size:190px;font-weight:700;line-height:1;letter-spacing:-5px}
+.hero .l{font-size:42px;text-align:right;line-height:1.3}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px}
+.box{border:5px solid #000;padding:26px 30px}
+.box .l{font-size:34px;font-weight:700;margin-bottom:14px}
+.bars{display:flex;align-items:flex-end;gap:12px;height:340px}
+.bars div{flex:1;background:#000}
+.x{font-size:26px;color:#666;display:flex;justify-content:space-between;margin-top:8px}
+.li{font-size:34px;line-height:1.5;display:flex;gap:16px}
+.li .cb{width:34px;height:34px;border:4px solid #000;flex:none;margin-top:12px}
+.li .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
+
+.sec{margin-top:30px}
+.sec h2{font-size:44px;font-weight:700;border-bottom:4px solid #000;padding-bottom:8px;margin-bottom:12px}
+.sec.dec h2{border-bottom-style:dashed;color:#444}
+.pi{font-size:36px;line-height:1.45;display:flex;gap:18px;padding:8px 0}
+.pi .cb{width:36px;height:36px;border:4px solid #000;flex:none;margin-top:12px}
+.sec.dec .pi .cb{border-radius:50%}
+.pi .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
+</style></head><body><div class="hdr"><h1>November 2026</h1><div class="right"><div class="btns"><span class="btn">Week</span><span class="btn">&lsaquo; This month</span></div><span class="sub"> · rendered Sat 31 Oct 19:56</span></div></div><table><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr><tr style="height:303px"><td class=" other"><div class="n">26</div></td><td class=" other"><div class="n">27</div></td><td class=" other"><div class="n">28</div></td><td class=" other"><div class="n">29</div></td><td class=" other"><div class="n">30</div><div class="e adhoc"><span class="m"></span>?SIG TOE workshop conference</div></td><td class="today other"><div class="n">31</div><div class="e adhoc"><span class="m"></span>?SIG TOE workshop conference</div><div class="e adhoc"><span class="m"></span>12:15 Flight to Sydney (JQ 409)</div></td><td class=""><div class="n">1</div><div class="e adhoc"><span class="m"></span>Decide on housed</div><div class="e hos"><span class="m"></span>Call - Perfusion - RPA</div></td></tr><tr style="height:303px"><td class=""><div class="n">2</div><div class="e work"><span class="m"></span>13:30 W2 PM RPA TAVI</div></td><td class=""><div class="n">3</div><div class="e work"><span class="m"></span>08:00 W2 RPA BMR CW</div></td><td class=""><div class="n">4</div><div class="e adhoc"><span class="m"></span>18:30 Mater Department of Anaesthesia Meeting</div></td><td class=""><div class="n">5</div><div class="e adhoc"><span class="m"></span>KP TN PM</div><div class="e hos"><span class="m"></span>Call - Adult Cardiac - POWPH</div></td><td class=""><div class="n">6</div><div class="e adhoc"><span class="m"></span>POWP O/N O/C</div><div class="e work"><span class="m"></span>08:00 W2 POW Grant</div></td><td class=""><div class="n">7</div><div class="e adhoc"><span class="m"></span>RPA Cardiac O/C</div></td><td class=""><div class="n">8</div><div class="e adhoc"><span class="m"></span>POW CTOT O/C</div></td></tr><tr style="height:303px"><td class=""><div class="n">9</div><div class="e work"><span class="m"></span>W3 MUH PM AD/KA EL</div></td><td class=""><div class="n">10</div><div class="e work"><span class="m"></span>W3 StGP GS</div></td><td class=""><div class="n">11</div><div class="e adhoc"><span class="m"></span>KP TN PM</div></td><td class=""><div class="n">12</div></td><td class=""><div class="n">13</div><div class="e work"><span class="m"></span>W3 Norwest AM ZH</div><div class="e work"><span class="m"></span>W3 MUH PM ZH</div></td><td class=""><div class="n">14</div><div class="e adhoc"><span class="m"></span>Kiats/Sumo</div></td><td class=""><div class="n">15</div></td></tr><tr style="height:303px"><td class=""><div class="n">16</div></td><td class=""><div class="n">17</div><div class="e work"><span class="m"></span>W4 RPA CQC JI</div></td><td class=""><div class="n">18</div><div class="e work"><span class="m"></span>W4 SSWP GS</div></td><td class=""><div class="n">19</div><div class="e work"><span class="m"></span>W4 NW ZH PM</div></td><td class=""><div class="n">20</div><div class="e work"><span class="m"></span>W4 StGP GS PM</div></td><td class=""><div class="n">21</div></td><td class=""><div class="n">22</div></td></tr><tr style="height:303px"><td class=""><div class="n">23</div><div class="e work"><span class="m"></span>W1 MUH PM AD/KA</div></td><td class=""><div class="n">24</div><div class="e adhoc"><span class="m"></span>POW Grant</div><div class="e hos"><span class="m"></span>08:00 ! Grant - POWPH</div><div class="e hos"><span class="m"></span>12:30 ! Grant - POWPH</div></td><td class=""><div class="n">25</div></td><td class=""><div class="n">26</div><div class="e adhoc"><span class="m"></span>POWP Keogh AM</div><div class="e adhoc"><span class="m"></span>13:00 Keogh Private Theatres</div></td><td class=""><div class="n">27</div><div class="e work"><span class="m"></span>W1 TAVI NG/EL</div></td><td class=""><div class="n">28</div></td><td class=""><div class="n">29</div></td></tr><tr style="height:303px"><td class=""><div class="n">30</div></td><td class=" other"><div class="n">1</div></td><td class=" other"><div class="n">2</div></td><td class=" other"><div class="n">3</div></td><td class=" other"><div class="n">4</div></td><td class=" other"><div class="n">5</div></td><td class=" other"><div class="n">6</div></td></tr></table><div class="legend"><span class="ev work"><span class="m"></span>Regular work</span><span class="ev hos"><span class="m"></span>HosPortal</span><span class="ev adhoc"><span class="m"></span>Adhoc</span></div><div class="nav"><div class="on">Agenda</div><div class="">TFC</div><div class="">Priorities</div><div class="">Kindle</div></div></body></html>

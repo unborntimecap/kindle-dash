@@ -36,6 +36,9 @@ h1{font-size:64px;font-weight:700;letter-spacing:-1px}
 .nav div{flex:1;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;border-right:6px solid #000}
 .nav div:last-child{border-right:0}
 .nav .on{background:#000;color:#fff}
+.btns{display:flex;gap:18px}
+.btn{border:5px solid #000;padding:14px 30px;font-size:36px;font-weight:700;min-width:300px;text-align:center}
+.hdr .right{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
 .foot{position:absolute;bottom:60px;right:70px;font-size:28px;color:#888}
 /* daily */
 .grid{position:relative;height:1840px;border-top:3px solid #ccc}
@@ -46,7 +49,7 @@ h1{font-size:64px;font-weight:700;letter-spacing:-1px}
 .blk .loc{font-size:30px;color:#444}
 .allday{font-size:36px;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:14px 40px}
 /* month */
-table{width:100%;height:1940px;border-collapse:collapse;table-layout:fixed}
+table{width:100%;height:1820px;border-collapse:collapse;table-layout:fixed}
 th{font-size:34px;padding:10px 0;border-bottom:5px solid #000}
 td{vertical-align:top;border:3px solid #bbb;padding:10px 12px;font-size:28px;line-height:1.3}
 td .n{font-size:40px;font-weight:700;margin-bottom:6px}
@@ -89,16 +92,24 @@ def ev_line(e):
     loc = f'<span class="loc">{html.escape(e["loc"])}</span>' if e.get("loc") else ""
     return f'<div class="ev {e["cal"]}"><span class="t">{t}</span>{mark(e)}<span>{html.escape(e["title"])}{loc}</span></div>'
 
-def agenda():
+def hdr(title, sub, b1, b2):
+    return (f'<div class="hdr"><h1>{title}</h1><div class="right"><div class="btns"><span class="btn">{b1}</span><span class="btn">{b2}</span></div>'
+            f'<span class="sub">{sub} · rendered {NOW}</span></div></div>')
+
+def agenda(week=0):
     body = ""
+    start = TODAY + dt.timedelta(days=7*week)
     for i in range(7):
-        d = TODAY + dt.timedelta(days=i)
+        d = start + dt.timedelta(days=i)
         evs = events_on(d)
-        lbl = "Today" if i == 0 else "Tomorrow" if i == 1 else d.strftime("%A")
-        body += f'<div class="day {"today" if i==0 else ""}"><h2>{lbl}<span>{d.strftime("%-d %b")}</span></h2>'
+        lbl = ("Today" if i == 0 else "Tomorrow" if i == 1 else d.strftime("%A")) if week == 0 else d.strftime("%A")
+        body += f'<div class="day {"today" if d==TODAY else ""}"><h2>{lbl}<span>{d.strftime("%-d %b")}</span></h2>'
         body += "".join(ev_line(e) for e in evs) or '<div class="empty">nothing scheduled</div>'
         body += "</div>"
-    return f'<div class="hdr"><h1>This week</h1><span class="sub">{TODAY.strftime("%a %-d %b %Y")} · rendered {NOW}</span></div>{body}{legend()}'
+    title = "This week" if week == 0 else "Next week"
+    sub = f'{start.strftime("%a %-d %b")} to {(start+dt.timedelta(6)).strftime("%a %-d %b")}'
+    return hdr(title, sub, "Month", "Next week &rsaquo;" if week == 0 else "&lsaquo; This week") + body + legend()
+def agenda_next(): return agenda(1)
 
 def daily():
     evs = events_on(TODAY)
@@ -114,12 +125,13 @@ def daily():
     return (f'<div class="hdr"><h1>{TODAY.strftime("%A %-d %B")}</h1><span class="sub">rendered {NOW}</span></div>'
             f'<div class="allday">{allday}</div><div class="grid">{hrs}{blks}</div>{legend()}')
 
-def month():
-    y, m = TODAY.year, TODAY.month
+def month(off=0):
+    y, m = TODAY.year, TODAY.month + off
+    y, m = y + (m - 1) // 12, (m - 1) % 12 + 1
     weeks = calendar.Calendar(firstweekday=0).monthdatescalendar(y, m)
     rows = ""
     for w in weeks:
-        rows += f'<tr style="height:{int(1940/len(weeks))}px">'
+        rows += f'<tr style="height:{int(1820/len(weeks))}px">'
         for d in w:
             cls = ("today" if d == TODAY else "") + (" other" if d.month != m else "")
             evs = events_on(d)
@@ -127,9 +139,9 @@ def month():
             rows += f'<td class="{cls}"><div class="n">{d.day}</div>{lines}</td>'
         rows += "</tr>"
     head = "".join(f"<th>{n}</th>" for n in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])
-    return (f'<div class="hdr"><h1>{TODAY.strftime("%B %Y")}</h1><span class="sub">rendered {NOW}</span></div>'
-            f'<table><tr>{head}</tr>{rows}</table>{legend()}')
-
+    title = dt.date(y, m, 1).strftime("%B %Y")
+    return hdr(title, "", "Week", "Next month &rsaquo;" if off == 0 else "&lsaquo; This month") + f'<table><tr>{head}</tr>{rows}</table>' + legend()
+def month_next(): return month(1)
 
 TFC = dict(paying=22, trial_live=6, trial_lapsed=30, active_1d=8, active_7d=22, signups_7d=1,
            flags=9, requests=0, exam=dt.date(2026, 11, 5), exam_n=7, series=[7,11,8,10,9,9,9,8,14,13,7,6,6,6],
@@ -219,8 +231,8 @@ def nav(cur):
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(); pg = await b.new_page(viewport={"width": 1860, "height": 2480})
-        for name, fn in [("agenda", agenda), ("daily", daily), ("month", month), ("tfc", tfc), ("priorities", priorities)]:
-            cur = {"agenda":"Agenda","daily":"Agenda","month":"Agenda","tfc":"TFC","priorities":"Priorities"}[name]
+        for name, fn in [("agenda", agenda), ("agenda-next", agenda_next), ("daily", daily), ("month", month), ("month-next", month_next), ("tfc", tfc), ("priorities", priorities)]:
+            cur = {"agenda":"Agenda","agenda-next":"Agenda","daily":"Agenda","month":"Agenda","month-next":"Agenda","tfc":"TFC","priorities":"Priorities"}[name]
             doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}{CSS_PRI}</style></head><body>{fn()}{nav(cur)}</body></html>"
             (HERE / f"{name}.html").write_text(doc)
             await pg.set_content(doc); await pg.screenshot(path=str(HERE / f"{name}.png"))
