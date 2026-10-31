@@ -1,5 +1,5 @@
 #!/bin/sh
-# kindle-dash v1.5. Tap this "book" to enter dashboard mode.
+# kindle-dash v1.6. Tap this "book" to enter dashboard mode.
 # Footer tabs: Agenda | TFC | Priorities | Kindle (exit). Header buttons on calendar pages: [Month/Week] [Next/Back].
 # Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
@@ -34,7 +34,7 @@ show() {  # $1 = page name
   PAGE=$1
   [ -s $D/dash-$1.png ] || fetch $1 || return 1
   eips -f -g $D/dash-$1.png
-  eips 88 95 " fetched $(date +%H:%M) "   # char cells: x,y. Adjust if it lands off the footer line
+  eips 36 4 "fetched $(date +%H:%M)"   # char cells ~17x24 px; row 4 = the "rendered" line, left of it
   log "shown $1"
 }
 
