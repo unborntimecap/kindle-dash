@@ -4,6 +4,7 @@ Edit this file; the Kindle picks it up on the next render.
 Format: `## Section`, then `- [ ] item | due` (the `| due` part is optional).
 A section whose name starts with "Decisions" renders with round markers.
 `- [x]` items are hidden.
+The `## TFC` section also feeds the "Pricing to-do" box on the TFC page.
 
 ## This week
 - [ ] TFC: Stripe $72 promo + send 5 win-back messages | Fri 7 Nov
@@ -25,6 +26,13 @@ A section whose name starts with "Decisions" renders with round markers.
 - [ ] El Nido wedding, Nathan + Leah (check it is booked) | Thu 10 Dec
 - [ ] MUH Monday / EL Friday: last shift | Mon 21 Dec
 - [ ] Perfusion: 40 runs by ~23 Feb; track W1 Tue pickups
+
+## TFC
+- [ ] Stripe $72 promo code, expires 7 Nov | Fri 7 Nov
+- [ ] Send $72 win-back: Spencer, Harshil, Praba, dm, Hayden | Fri 7 Nov
+- [ ] Fix trial expiry: 30 lapsed trials still status=trialing | now
+- [ ] Group offer to haz, Chengus | 6-8 Nov
+- [ ] Pricing page: remove 'rises 1 Nov' copy
 
 ## Decisions, not tasks
 - [ ] House cleaning: deep clean or regular? (with Sarah)

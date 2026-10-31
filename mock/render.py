@@ -124,9 +124,7 @@ def month():
 TFC = dict(paying=22, trial_live=6, trial_lapsed=30, active_1d=8, active_7d=22, signups_7d=1,
            flags=9, requests=0, exam=dt.date(2026, 11, 5), exam_n=7, series=[7,11,8,10,9,9,9,8,14,13,7,6,6,6],
            ending=[("haz", "10 Nov"), ("Chengus", "12 Nov")],
-           actions=[("Stripe $72 promo code, expires 7 Nov", "Fri 7 Nov"), ("Send $72 win-back: Spencer, Harshil, Praba, dm, Hayden", "Fri 7 Nov"),
-                    ("Fix trial expiry: 30 lapsed trials still status=trialing", "now"), ("Group offer to haz, Chengus", "6-8 Nov"),
-                    ("Pricing page: remove 'rises 1 Nov' copy", "")])
+           actions=None)
 LOGO = (HERE / "tfc-logo.svg").read_text()
 CSS_TFC = """
 .col{display:flex;flex-direction:column;height:2220px}
@@ -155,6 +153,7 @@ CSS_TFC = """
 .li .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
 """
 def tfc():
+    TFC["actions"] = dict(load_pri()).get("TFC", [])
     days = (TFC["exam"] - TOday()).days
     mx = max(TFC["series"])
     bars = "".join(f'<div style="height:{v/mx*100}%"></div>' for v in TFC["series"])
@@ -198,6 +197,7 @@ CSS_PRI = """
 def priorities():
     body = ""
     for title, items in PRI:
+        if title == "TFC": continue
         cls = "dec" if title.startswith("Decisions") else ""
         body += f'<div class="sec {cls}"><h2>{title}</h2>' + "".join(
             f'<div class="pi"><span class="cb"></span><span>{html.escape(t)}</span><span class="due">{d}</span></div>' for t, d in items) + "</div>"
