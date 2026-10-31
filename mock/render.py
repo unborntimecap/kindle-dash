@@ -1,0 +1,118 @@
+"""Mockup renderer: events.json -> agenda/daily/month HTML -> 1860x2480 greyscale PNG."""
+import json, datetime as dt, calendar, html, asyncio
+from pathlib import Path
+from playwright.async_api import async_playwright
+from PIL import Image
+
+HERE = Path(__file__).parent
+TODAY = dt.date(2026, 11, 3)  # pretend it's a busy Tuesday so the mock has content
+EV = json.loads((HERE / "events.json").read_text())
+for e in EV:
+    e["d"] = dt.date.fromisoformat(e["date"])
+
+CSS = """
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1860px;height:2480px;background:#fff;color:#000;font-family:'DejaVu Sans',Helvetica,Arial,sans-serif;padding:60px 70px;overflow:hidden}
+h1{font-size:64px;font-weight:700;letter-spacing:-1px}
+.hdr{display:flex;justify-content:space-between;align-items:baseline;border-bottom:6px solid #000;padding-bottom:18px;margin-bottom:30px}
+.hdr .sub{font-size:34px;color:#555}
+.day{margin-bottom:26px;padding-left:24px;border-left:8px solid #fff}
+.day.today{border-left-color:#000}
+.day h2{font-size:42px;font-weight:700;margin-bottom:8px}
+.day h2 span{font-weight:400;color:#555;font-size:34px;margin-left:16px}
+.ev{display:flex;font-size:36px;line-height:1.35;padding:4px 0 4px 0}
+.ev .t{width:230px;flex:none;color:#333;font-variant-numeric:tabular-nums}
+.ev .m{width:34px;height:34px;flex:none;margin:8px 18px 0 0;border:4px solid #000}
+.work .m{background:#000}
+.hos .m{background:repeating-linear-gradient(45deg,#000 0 4px,#fff 4px 8px)}
+.adhoc .m{background:#fff}
+.ev .loc{color:#666;margin-left:14px}
+.empty{font-size:34px;color:#888;font-style:italic;padding:4px 0}
+.legend{position:absolute;bottom:60px;left:70px;right:70px;display:flex;gap:48px;font-size:30px;color:#444;border-top:3px solid #000;padding-top:16px}
+.legend .m{margin-top:4px}
+.foot{position:absolute;bottom:60px;right:70px;font-size:28px;color:#888}
+/* daily */
+.grid{position:relative;height:1980px;border-top:3px solid #ccc}
+.hr{position:absolute;left:0;right:0;border-top:3px solid #ddd;font-size:30px;color:#777;padding-left:6px}
+.hr.now{border-top:6px solid #000}
+.blk{position:absolute;left:170px;right:20px;border:5px solid #000;padding:10px 18px;font-size:38px;background:#fff;overflow:hidden}
+.blk.hos{background:repeating-linear-gradient(45deg,#fff 0 10px,#e6e6e6 10px 20px)}
+.blk .loc{font-size:30px;color:#444}
+.allday{font-size:36px;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:14px 40px}
+/* month */
+table{width:100%;height:2080px;border-collapse:collapse;table-layout:fixed}
+th{font-size:34px;padding:10px 0;border-bottom:5px solid #000}
+td{vertical-align:top;border:3px solid #bbb;padding:10px 12px;font-size:28px;line-height:1.3}
+td .n{font-size:40px;font-weight:700;margin-bottom:6px}
+td.today{border:8px solid #000}
+td.other .n{color:#aaa}
+td .e{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
+td .m{width:20px;height:20px;border:3px solid #000;margin:0 10px 0 0;flex:none}
+"""
+
+def mark(e): return f'<span class="m"></span>'
+def legend(): return ('<div class="legend"><span class="ev work"><span class="m"></span>Regular work</span>'
+                      '<span class="ev hos"><span class="m"></span>HosPortal</span>'
+                      '<span class="ev adhoc"><span class="m"></span>Adhoc</span></div>')
+
+def events_on(d):
+    out = [e for e in EV if e["d"] == d or (e.get("end") and e["d"] <= d < dt.date.fromisoformat(e["end"]))]
+    return sorted(out, key=lambda e: (not e.get("allday"), e.get("start", "")))
+
+def ev_line(e):
+    t = "all day" if e.get("allday") else f'{e["start"]}–{e["endt"]}'
+    loc = f'<span class="loc">{html.escape(e["loc"])}</span>' if e.get("loc") else ""
+    return f'<div class="ev {e["cal"]}"><span class="t">{t}</span>{mark(e)}<span>{html.escape(e["title"])}{loc}</span></div>'
+
+def agenda():
+    body = ""
+    for i in range(7):
+        d = TODAY + dt.timedelta(days=i)
+        evs = events_on(d)
+        lbl = "Today" if i == 0 else "Tomorrow" if i == 1 else d.strftime("%A")
+        body += f'<div class="day {"today" if i==0 else ""}"><h2>{lbl}<span>{d.strftime("%-d %b")}</span></h2>'
+        body += "".join(ev_line(e) for e in evs) or '<div class="empty">nothing scheduled</div>'
+        body += "</div>"
+    return f'<div class="hdr"><h1>This week</h1><span class="sub">{TODAY.strftime("%a %-d %b %Y")} · updated 07:30</span></div>{body}{legend()}'
+
+def daily():
+    evs = events_on(TODAY)
+    allday = "".join(f'<span class="ev {e["cal"]}">{mark(e)}{html.escape(e["title"])}</span>' for e in evs if e.get("allday"))
+    H0, H1 = 7, 21; px = 1980 / (H1 - H0)
+    hrs = "".join(f'<div class="hr" style="top:{(h-H0)*px}px">{h:02d}:00</div>' for h in range(H0, H1))
+    now = 10.4; hrs += f'<div class="hr now" style="top:{(now-H0)*px}px"></div>'
+    blks = ""
+    for e in evs:
+        if e.get("allday"): continue
+        s = int(e["start"][:2]) + int(e["start"][3:]) / 60; en = int(e["endt"][:2]) + int(e["endt"][3:]) / 60
+        blks += f'<div class="blk {e["cal"]}" style="top:{(s-H0)*px+2}px;height:{(en-s)*px-6}px"><b>{e["start"]}</b> {html.escape(e["title"])}<div class="loc">{html.escape(e.get("loc",""))}</div></div>'
+    return (f'<div class="hdr"><h1>{TODAY.strftime("%A %-d %B")}</h1><span class="sub">updated 10:24</span></div>'
+            f'<div class="allday">{allday}</div><div class="grid">{hrs}{blks}</div>{legend()}')
+
+def month():
+    y, m = TODAY.year, TODAY.month
+    weeks = calendar.Calendar(firstweekday=0).monthdatescalendar(y, m)
+    rows = ""
+    for w in weeks:
+        rows += f'<tr style="height:{int(2080/len(weeks))}px">'
+        for d in w:
+            cls = ("today" if d == TODAY else "") + (" other" if d.month != m else "")
+            evs = events_on(d)
+            lines = "".join(f'<div class="e {e["cal"]}">{mark(e)}{"" if e.get("allday") else e["start"]+" "}{html.escape(e["title"])}</div>' for e in evs[:7])
+            rows += f'<td class="{cls}"><div class="n">{d.day}</div>{lines}</td>'
+        rows += "</tr>"
+    head = "".join(f"<th>{n}</th>" for n in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])
+    return (f'<div class="hdr"><h1>{TODAY.strftime("%B %Y")}</h1><span class="sub">updated 07:30</span></div>'
+            f'<table><tr>{head}</tr>{rows}</table>{legend()}')
+
+async def main():
+    async with async_playwright() as p:
+        b = await p.chromium.launch(); pg = await b.new_page(viewport={"width": 1860, "height": 2480})
+        for name, fn in [("agenda", agenda), ("daily", daily), ("month", month)]:
+            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}</style></head><body>{fn()}</body></html>"
+            (HERE / f"{name}.html").write_text(doc)
+            await pg.set_content(doc); await pg.screenshot(path=str(HERE / f"{name}.png"))
+            im = Image.open(HERE / f"{name}.png").convert("L").quantize(16).convert("L")
+            im.save(HERE / f"{name}.png", optimize=True); print(name, "ok")
+        await b.close()
+asyncio.run(main())
