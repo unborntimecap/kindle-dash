@@ -16,7 +16,7 @@ CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
 body{width:1860px;height:2480px;background:#fff;color:#000;font-family:'DejaVu Sans',Helvetica,Arial,sans-serif;padding:60px 70px;overflow:hidden}
 h1{font-size:64px;font-weight:700;letter-spacing:-1px}
-.hdr{display:flex;justify-content:space-between;align-items:baseline;border-bottom:6px solid #000;padding-bottom:18px;margin-bottom:30px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:6px solid #000;padding-bottom:18px;margin-bottom:30px}
 .hdr .sub{font-size:34px;color:#555}
 .day{margin-bottom:26px;padding-left:24px;border-left:8px solid #fff}
 .day.today{border-left-color:#000}
@@ -38,7 +38,7 @@ h1{font-size:64px;font-weight:700;letter-spacing:-1px}
 .nav .on{background:#000;color:#fff}
 .btns{display:flex;gap:18px}
 .btn{border:5px solid #000;padding:14px 30px;font-size:36px;font-weight:700;min-width:300px;text-align:center}
-.hdr .right{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.hdr .right{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;height:140px}
 .foot{position:absolute;bottom:60px;right:70px;font-size:28px;color:#888}
 /* daily */
 .grid{position:relative;height:1840px;border-top:3px solid #ccc}
@@ -153,8 +153,8 @@ CSS_TFC = """
 .col .grow{flex:1}
 .tile .v{font-size:150px}
 .brand{display:flex;align-items:center;gap:26px}
-.brand svg{width:96px;height:96px}
-.brand .w{font-size:46px;font-weight:700;letter-spacing:6px}
+.brand svg{width:72px;height:72px}
+.brand .w{font-size:40px;font-weight:700;letter-spacing:5px;line-height:1}
 .tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:28px}
 .tile{border:5px solid #000;padding:36px 30px 30px}
 .tile .v{font-size:130px;font-weight:700;line-height:1;letter-spacing:-3px}
@@ -182,7 +182,7 @@ def tfc():
     T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
     acts = "".join(f'<div class="li"><span class="cb"></span><span>{a}</span><span class="due">{d}</span></div>' for a, d in TFC["actions"])
     ends = "".join(f'<div class="li"><span>{n}</span><span class="due">{d}</span></div>' for n, d in TFC["ending"])
-    return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><span class="sub">rendered {NOW}</span></div>'
+    return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div>'
         f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{TFC["exam"].strftime("%a %-d %b")} · {TFC["exam_n"]} candidates</div></div>'
         '<div class="tiles">'
         + T(TFC["paying"], "paying", "subscriptions active")
@@ -223,7 +223,7 @@ def priorities():
         cls = "dec" if title.startswith("Decisions") else ""
         body += f'<div class="sec {cls}"><h2>{title}</h2>' + "".join(
             f'<div class="pi"><span class="cb"></span><span>{html.escape(t)}</span><span class="due">{d}</span></div>' for t, d in items) + "</div>"
-    return f'<div class="hdr"><h1>Priorities</h1><span class="sub">from handoffs 23-31 Oct · rendered {NOW}</span></div>{body}'
+    return f'<div class="hdr"><h1>Priorities</h1><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div>{body}'
 
 def nav(cur):
     return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Kindle"]) + '</div>'
