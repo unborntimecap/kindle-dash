@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [render/**, priorities.md, hide.txt, .github/workflows/render.yml]
+    paths: [render/**, priorities.md, hide.txt, rerender.txt, .github/workflows/render.yml]
 
 permissions:
   contents: write
