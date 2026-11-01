@@ -217,7 +217,10 @@ def tfc():
         now = '<div class="why">CLAUDE.md unparsed; showing vault TFC block</div>'
     # one live-trial row per person; filled box = reached Stripe checkout (the ones worth chasing)
     ends = "".join(f'<div class="li"><span class="cb{" on" if c else ""}"></span><span>{html.escape(n)}</span><span class="due">{d}</span></div>' for n, d, c in TFC["ending"]) or '<div class="li dim">none</div>'
-    sitting = "".join(f'<div class="li{" dim" if s["label"] in ("exam passed", "no date") else ""}"><span>{s["label"]}</span><span class="due n">{s["n"]}</span></div>' for s in TFC.get("by_sitting", []))
+    # ANZCA sitting (YYYY.1 / YYYY.2) with its written date; greyed once the written has passed
+    sitting = "".join(f'<div class="li{" dim" if s.get("passed") or s["label"] == "no date" else ""}"><span>{s["label"]}'
+                      + (f'<span style="color:#666"> · written {s["written"]}</span>' if s.get("written") else "")
+                      + f'</span><span class="due n">{s["n"]}</span></div>' for s in TFC.get("by_sitting", []))
     conv = f'{round(100*TFC["conv_n"]/TFC["conv_d"])}%' if TFC.get("conv_d") else "–"
     return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div>'
         + (f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{exam_txt}</div></div>' if TFC["exam"] and days <= 30
