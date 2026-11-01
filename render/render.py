@@ -214,7 +214,7 @@ def tfc():
            else f'<div class="hero slim"><span class="l"><b>{days}</b> days to FANZCA written · {exam_txt}</span></div>')
         +
         '<div class="tiles">'
-        + T(TFC["paying"], "paying", "subscriptions active")
+        + T(TFC["paying"], "paying", " · ".join(f'{s["n"]} {s["label"]}' for s in TFC.get("by_sitting", [])) or "subscriptions active")
         + T(TFC["trial_live"], "live trials", f'{TFC["trial_lapsed"]} lapsed, never converted')
         + T(TFC["signups_7d"], "signups", "last 7 days")
         + T(f'{TFC["active_1d"]}<span style="font-size:64px;color:#666"> / {TFC["active_7d"]}</span>', "active users", "today / 7 days")
