@@ -165,6 +165,13 @@ CSS_TFC = """
 .brand svg{width:72px;height:72px}
 .brand .w{font-size:40px;font-weight:700;letter-spacing:5px;line-height:1}
 .tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:28px}
+.tiles.kpi{grid-template-columns:1fr 1fr 1fr 1fr}
+.tiles.kpi .tile{padding:22px 26px 20px}
+.tiles.kpi .tile .v{font-size:96px}
+.tiles.kpi .tile .l{font-size:30px;margin-top:10px}
+.li.dim,.li.dim .due{color:#999}
+.li .due.n{font-weight:700;color:#000;font-variant-numeric:tabular-nums}
+.li .cb.on{background:#000}
 .tile{border:5px solid #000;padding:36px 30px 30px}
 .tile .v{font-size:130px;font-weight:700;line-height:1;letter-spacing:-3px}
 .tile .l{font-size:36px;color:#222;margin-top:16px}
@@ -178,7 +185,7 @@ CSS_TFC = """
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px}
 .box{border:5px solid #000;padding:26px 30px}
 .box .l{font-size:34px;font-weight:700;margin-bottom:14px}
-.bars{display:flex;align-items:flex-end;gap:12px;height:340px}
+.bars{display:flex;align-items:flex-end;gap:12px;height:300px}
 .bars .c{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
 .bars .n{font-size:24px;color:#444;text-align:center;line-height:1;margin-bottom:4px}
 .bars .b{background:#000}
@@ -197,7 +204,7 @@ def tfc():
     days = (TFC["exam"] - TODAY).days if TFC["exam"] else "–"
     exam_txt = f'{TFC["exam"].strftime("%a %-d %b")} · {TFC["exam_n"]} candidates' if TFC["exam"] else "no sitting scheduled"
     mx = max(TFC["series"]) or 1
-    bars = "".join(f'<div class="c"><div class="n">{v}</div><div class="b" style="height:{round(v/mx*300)}px"></div></div>' for v in TFC["series"])
+    bars = "".join(f'<div class="c"><div class="n">{v}</div><div class="b" style="height:{round(v/mx*260)}px"></div></div>' for v in TFC["series"])
     T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
     acts = "".join(f'<div class="li"><span class="cb"></span><span>{a}</span><span class="due">{d}</span></div>' for a, d in TFC["actions"])
     NW = sources.tfc_now()
@@ -208,22 +215,24 @@ def tfc():
         acts = ""  # the vault TFC block stays on the Priorities page
     else:
         now = '<div class="why">CLAUDE.md unparsed; showing vault TFC block</div>'
-    ends = "".join(f'<div class="li"><span>{n}</span><span class="due">{d}</span></div>' for n, d in TFC["ending"])
+    # one live-trial row per person; filled box = reached Stripe checkout (the ones worth chasing)
+    ends = "".join(f'<div class="li"><span class="cb{" on" if c else ""}"></span><span>{html.escape(n)}</span><span class="due">{d}</span></div>' for n, d, c in TFC["ending"]) or '<div class="li dim">none</div>'
+    sitting = "".join(f'<div class="li{" dim" if s["label"] in ("exam passed", "no date") else ""}"><span>{s["label"]}</span><span class="due n">{s["n"]}</span></div>' for s in TFC.get("by_sitting", []))
+    conv = f'{round(100*TFC["conv_n"]/TFC["conv_d"])}%' if TFC.get("conv_d") else "–"
     return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div>'
         + (f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{exam_txt}</div></div>' if TFC["exam"] and days <= 30
            else f'<div class="hero slim"><span class="l"><b>{days}</b> days to FANZCA written · {exam_txt}</span></div>')
         +
-        '<div class="tiles">'
-        + T(TFC["paying"], "paying", " · ".join(f'{s["n"]} {s["label"]}' for s in TFC.get("by_sitting", [])) or "subscriptions active")
-        + T(TFC["trial_live"], "live trials", f'{TFC["trial_lapsed"]} lapsed, never converted')
-        + T(TFC["signups_7d"], "signups", "last 7 days")
-        + T(f'{TFC["active_1d"]}<span style="font-size:64px;color:#666"> / {TFC["active_7d"]}</span>', "active users", "today / 7 days")
-        + T(f'{round(100*TFC["conv_n"]/TFC["conv_d"])}%' if TFC.get("conv_d") else "–", "trial conversion", f'{TFC.get("conv_n",0)} of {TFC.get("conv_d",0)} ended, last 30 days')
-        + T(TFC["requests"], "feature requests", "open")
+        '<div class="tiles kpi">'
+        + T(TFC["paying"], "paying")
+        + T(f'{TFC["active_1d"]}<span style="font-size:48px;color:#666"> / {TFC["active_7d"]}</span>', "active today / 7d")
+        + T(TFC["signups_7d"], "signups, 7 days")
+        + T(conv, "trial conversion", f'{TFC.get("conv_n",0)} of {TFC.get("conv_d",0)}, 30 d')
         + '</div>'
-        f'<div class="row2"><div class="box"><div class="l">Daily active users, 14 days<span>peak {mx}</span></div><div class="bars">{bars}</div>'
+        f'<div class="row2"><div class="box"><div class="l">Paying by sitting<span>{TFC["paying"]}</span></div>{sitting}</div>'
+        f'<div class="box"><div class="l">On trial<span>{TFC["trial_live"]} live · {TFC["trial_lapsed"]} lapsed</span></div>{ends}<div class="x" style="justify-content:flex-start;gap:12px;margin-top:12px"><span class="cb on" style="display:inline-block;width:24px;height:24px;border:3px solid #000;background:#000"></span>started checkout</div></div></div>'
+        f'<div class="box" style="margin-top:28px"><div class="l">Daily active users, 14 days<span>peak {mx}</span></div><div class="bars">{bars}</div>'
         f'<div class="x"><span>{(TODAY-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>'
-        f'<div class="box"><div class="l">Trials ending this fortnight</div>{ends}</div></div>'
         f'<div class="box grow" style="margin-top:28px"><div class="l">Now</div>{now}{acts}</div></div>')
 
 PRI = sources.priorities()

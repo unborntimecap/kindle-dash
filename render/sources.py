@@ -133,7 +133,7 @@ def tfc():
     if not text: return None
     d = json.loads(text)
     d["exam"] = dt.date.fromisoformat(d["exam"]) if d.get("exam") else None
-    d["ending"] = [(x["name"], x["date"]) for x in d.get("ending", [])]
+    d["ending"] = [(x["name"], x["date"], x.get("checkout", False)) for x in d.get("ending", [])]
     return d
 
 def hide_list():
