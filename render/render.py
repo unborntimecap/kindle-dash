@@ -155,7 +155,7 @@ def month(off=0):
 def month_next(): return month(1)
 
 TFC = sources.tfc() or dict(paying="?", trial_live="?", trial_lapsed="?", active_1d="?", active_7d="?", signups_7d="?",
-                            flags=0, requests=0, exam=None, exam_n=0, series=[0]*14, ending=[])
+                            flags=0, requests=0, conv_n=0, conv_d=0, exam=None, exam_n=0, series=[0]*14, ending=[])
 LOGO = (HERE.parent / "mock" / "tfc-logo.svg").read_text()
 CSS_TFC = """
 .col{display:flex;flex-direction:column;height:2220px}
@@ -202,7 +202,7 @@ def tfc():
         + T(TFC["trial_live"], "live trials", f'{TFC["trial_lapsed"]} lapsed, never converted')
         + T(TFC["signups_7d"], "signups", "last 7 days")
         + T(f'{TFC["active_1d"]}<span style="font-size:64px;color:#666"> / {TFC["active_7d"]}</span>', "active users", "today / 7 days")
-        + T(TFC["flags"], "open SAQ flags", "user-reported errors", "warn" if TFC["flags"] else "")
+        + T(f'{round(100*TFC["conv_n"]/TFC["conv_d"])}%' if TFC.get("conv_d") else "–", "trial conversion", f'{TFC.get("conv_n",0)} of {TFC.get("conv_d",0)} ended, last 30 days')
         + T(TFC["requests"], "feature requests", "open")
         + '</div>'
         f'<div class="row2"><div class="box"><div class="l">Daily active users, 14 days<span>peak {mx}</span></div><div class="bars">{bars}</div>'
