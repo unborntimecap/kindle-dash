@@ -198,11 +198,11 @@ def tfc():
     bars = "".join(f'<div class="c"><div class="n">{v}</div><div class="b" style="height:{round(v/mx*300)}px"></div></div>' for v in TFC["series"])
     T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
     acts = "".join(f'<div class="li"><span class="cb"></span><span>{a}</span><span class="due">{d}</span></div>' for a, d in TFC["actions"])
-    NOW = sources.tfc_now()
-    if NOW:
-        now = (f'<div class="gate">{NOW["gate"]}</div>' if NOW["gate"] else "") + f'<div class="now">{NOW["headline"]}</div>' \
-            + (f'<div class="why"><b>Do first:</b> {NOW["do_first"]}</div>' if NOW["do_first"] else "") \
-            + (f'<div class="why" style="margin-top:14px"><b>Finish now</b></div>' + "".join(f'<div class="li"><span class="cb"></span><span>{x}</span></div>' for x in NOW["finish"]) if NOW["finish"] else "")
+    NW = sources.tfc_now()
+    if NW:
+        now = (f'<div class="gate">{NW["gate"]}</div>' if NW["gate"] else "") + f'<div class="now">{NW["headline"]}</div>' \
+            + (f'<div class="why"><b>Do first:</b> {NW["do_first"]}</div>' if NW["do_first"] else "") \
+            + (f'<div class="why" style="margin-top:14px"><b>Finish now</b></div>' + "".join(f'<div class="li"><span class="cb"></span><span>{x}</span></div>' for x in NW["finish"]) if NW["finish"] else "")
         acts = ""  # the vault TFC block stays on the Priorities page
     else:
         now = '<div class="why">CLAUDE.md unparsed; showing vault TFC block</div>'
