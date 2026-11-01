@@ -173,6 +173,8 @@ CSS_TFC = """
 .hero{border:6px solid #000;background:#000;color:#fff;padding:36px 48px;display:flex;justify-content:space-between;align-items:center;margin-top:28px}
 .hero .v{font-size:190px;font-weight:700;line-height:1;letter-spacing:-5px}
 .hero .l{font-size:42px;text-align:right;line-height:1.3}
+.hero.slim{padding:18px 48px;justify-content:flex-start}
+.hero.slim .l{font-size:40px;text-align:left}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px}
 .box{border:5px solid #000;padding:26px 30px}
 .box .l{font-size:34px;font-weight:700;margin-bottom:14px}
@@ -208,7 +210,9 @@ def tfc():
         now = '<div class="why">CLAUDE.md unparsed; showing vault TFC block</div>'
     ends = "".join(f'<div class="li"><span>{n}</span><span class="due">{d}</span></div>' for n, d in TFC["ending"])
     return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div>'
-        f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{exam_txt}</div></div>'
+        + (f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{exam_txt}</div></div>' if TFC["exam"] and days <= 30
+           else f'<div class="hero slim"><span class="l"><b>{days}</b> days to FANZCA written · {exam_txt}</span></div>')
+        +
         '<div class="tiles">'
         + T(TFC["paying"], "paying", "subscriptions active")
         + T(TFC["trial_live"], "live trials", f'{TFC["trial_lapsed"]} lapsed, never converted')
