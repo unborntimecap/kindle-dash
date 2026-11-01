@@ -138,3 +138,34 @@ def tfc():
 
 def hide_list():
     return [l.strip().lower() for l in (ROOT / "hide.txt").read_text().splitlines() if l.strip() and not l.startswith("#")]
+
+
+# ---------- TFC "Now" box: next workstream from the TFC repo's CLAUDE.md ----------
+def _tfc_claude_md():
+    tok, repo = os.environ.get("VAULT_TOKEN"), os.environ.get("TFC_REPO", "unborntimecap/thefinalcountdown")
+    if not tok: raise RuntimeError("VAULT_TOKEN not set")
+    r = _get(f"https://api.github.com/repos/{repo}/contents/CLAUDE.md",
+             headers={"Authorization": f"Bearer {tok}", "Accept": "application/vnd.github.raw+json"})
+    return r.text
+
+def _short(line, n=78):
+    """Strip doc paths to their slug, collapse backticks, cut at n chars."""
+    line = re.sub(r"`docs/(?:HANDOFF|RFC|SCOPING|DECISION)-(?:\d{4}-\d{2}-\d{2}-)?([^`]+?)(?:-v\d)?\.md`", r"\1", line)
+    line = re.sub(r"`([^`]*)`", r"\1", line).replace(" — ", ": ").replace("—", ",").strip()
+    return line if len(line) <= n else line[:n-1].rstrip() + "…"
+
+def tfc_now():
+    """dict(gate, headline, do_first, finish) from CLAUDE.md 'Open workstreams', or None if it cannot be parsed.
+    Conventions it relies on: a bold '**Build next (…)**' heading with bullets, a '**Finish now**' heading with
+    bullets, and a 'Do first (…): …' sentence under '### Architecture health'."""
+    text = _cached("tfc-claude.md", _tfc_claude_md)
+    if not text: return None
+    m = re.search(r"\*\*Build next(?: \(([^)]*)\))?\*\*\n((?:- .*\n?)+)", text)
+    if not m: return None
+    gate, first = (m.group(1) or "").strip(), m.group(2).splitlines()[0][2:]
+    headline = _short(re.split(r"(?<=[.;])\s| \+ ", first, 1)[0], 110)
+    f = re.search(r"\*\*Finish now\*\*\n((?:- .*\n?)+)", text)
+    finish = [_short(l[2:]) for l in f.group(1).splitlines()] if f else []
+    d = re.search(r"Do first[^:]*:\s*(.+?\.)\s", text)
+    do_first = _short(re.sub(r"\s*\([^)]*\)", "", d.group(1)), 110) if d else ""
+    return dict(gate=gate, headline=headline, do_first=do_first, finish=finish)
