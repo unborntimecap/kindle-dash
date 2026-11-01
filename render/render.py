@@ -177,7 +177,10 @@ CSS_TFC = """
 .box{border:5px solid #000;padding:26px 30px}
 .box .l{font-size:34px;font-weight:700;margin-bottom:14px}
 .bars{display:flex;align-items:flex-end;gap:12px;height:340px}
-.bars div{flex:1;background:#000}
+.bars .c{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars .n{font-size:24px;color:#444;text-align:center;line-height:1;margin-bottom:4px}
+.bars .b{background:#000}
+.box .l span{float:right;font-weight:400;color:#666}
 .x{font-size:26px;color:#666;display:flex;justify-content:space-between;margin-top:8px}
 .li{font-size:34px;line-height:1.5;display:flex;gap:16px}
 .li .cb{width:34px;height:34px;border:4px solid #000;flex:none;margin-top:12px}
@@ -188,7 +191,7 @@ def tfc():
     days = (TFC["exam"] - TODAY).days if TFC["exam"] else "–"
     exam_txt = f'{TFC["exam"].strftime("%a %-d %b")} · {TFC["exam_n"]} candidates' if TFC["exam"] else "no sitting scheduled"
     mx = max(TFC["series"]) or 1
-    bars = "".join(f'<div style="height:{v/mx*100}%"></div>' for v in TFC["series"])
+    bars = "".join(f'<div class="c"><div class="n">{v}</div><div class="b" style="height:{round(v/mx*300)}px"></div></div>' for v in TFC["series"])
     T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
     acts = "".join(f'<div class="li"><span class="cb"></span><span>{a}</span><span class="due">{d}</span></div>' for a, d in TFC["actions"])
     ends = "".join(f'<div class="li"><span>{n}</span><span class="due">{d}</span></div>' for n, d in TFC["ending"])
@@ -202,10 +205,10 @@ def tfc():
         + T(TFC["flags"], "open SAQ flags", "user-reported errors", "warn" if TFC["flags"] else "")
         + T(TFC["requests"], "feature requests", "open")
         + '</div>'
-        f'<div class="row2"><div class="box"><div class="l">Daily active users, 14 days</div><div class="bars">{bars}</div>'
+        f'<div class="row2"><div class="box"><div class="l">Daily active users, 14 days<span>peak {mx}</span></div><div class="bars">{bars}</div>'
         f'<div class="x"><span>{(TODAY-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>'
         f'<div class="box"><div class="l">Trials ending this fortnight</div>{ends}</div></div>'
-        f'<div class="box grow" style="margin-top:28px"><div class="l">Pricing to-do</div>{acts}</div></div>')
+        f'<div class="box grow" style="margin-top:28px"><div class="l">TFC to-do</div>{acts}</div></div>')
 
 PRI = sources.priorities()
 CSS_PRI = """
