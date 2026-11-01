@@ -159,7 +159,7 @@ TFC = sources.tfc() or dict(paying="?", trial_live="?", trial_lapsed="?", active
 LOGO = (HERE.parent / "mock" / "tfc-logo.svg").read_text()
 CSS_TFC = """
 .col{display:flex;flex-direction:column;height:2220px}
-.col .grow{flex:1}
+.col .grow{flex:1;overflow:hidden}
 .tile .v{font-size:150px}
 .brand{display:flex;align-items:center;gap:26px}
 .brand svg{width:72px;height:72px}
@@ -211,7 +211,7 @@ def tfc():
     if NW:
         now = (f'<div class="gate">{NW["gate"]}</div>' if NW["gate"] else "") + f'<div class="now">{NW["headline"]}</div>' \
             + (f'<div class="why"><b>Do first:</b> {NW["do_first"]}</div>' if NW["do_first"] else "") \
-            + (f'<div class="why" style="margin-top:14px"><b>Finish now</b></div>' + "".join(f'<div class="li"><span class="cb"></span><span>{x}</span></div>' for x in NW["finish"]) if NW["finish"] else "")
+            + (f'<div class="why" style="margin-top:14px"><b>Finish now</b></div>' + "".join(f'<div class="li"><span class="cb"></span><span>{x}</span></div>' for x in NW["finish"][:4]) if NW["finish"] else "")
         acts = ""  # the vault TFC block stays on the Priorities page
     else:
         now = '<div class="why">CLAUDE.md unparsed; showing vault TFC block</div>'
