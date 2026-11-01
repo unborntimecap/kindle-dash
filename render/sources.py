@@ -86,10 +86,13 @@ def _vault_note():
              headers={"Authorization": f"Bearer {tok}", "Accept": "application/vnd.github+json"})
     return base64.b64decode(r.json()["content"]).decode()
 
+NOTES = {}  # section -> prose lines (filled by priorities())
+
 def priorities():
     """[(section, [(title, due), ...]), ...]. Reads the vault note's '## Active' block: '### X' sub-headings are
     sections, lines '- [ ] **Title** — detail | due' or '- [ ] text | due'. Falls back to priorities.md (## sections)."""
     text = _cached("cowork-todo.md", _vault_note)
+    NOTES.clear()
     if text and "## Active" in text:
         body = text.split("## Active", 1)[1]
         body = re.split(r"\n## ", body)[0]  # stop at the next H2 (e.g. ## Done)
@@ -103,6 +106,8 @@ def priorities():
                 m = re.match(r"\*\*(.+?)\*\*", item.strip())
                 title = m.group(1) if m else item.strip()
                 cur[1].append((title.strip(), due.strip()))
+            elif line.strip() and not line.lstrip().startswith(("-", "#", "[")):
+                NOTES.setdefault(cur[0], []).append(line.strip())  # prose under a section, e.g. the TFC "Now" blurb
         if cur[1]: secs.append(cur)
         if secs: return secs
     print("[warn] vault note unavailable or empty, using priorities.md")

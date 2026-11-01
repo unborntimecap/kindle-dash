@@ -1,5 +1,5 @@
 """Kindle dashboard renderer: live sources -> HTML -> 1860x2480 16-grey PNGs in render/out/."""
-import json, datetime as dt, calendar, html, asyncio
+import json, re, datetime as dt, calendar, html, asyncio
 from zoneinfo import ZoneInfo
 NOW = dt.datetime.now(ZoneInfo("Australia/Sydney")).strftime("%a %-d %b %H:%M")
 from pathlib import Path
@@ -182,7 +182,10 @@ CSS_TFC = """
 .bars .b{background:#000}
 .box .l span{float:right;font-weight:400;color:#666}
 .x{font-size:26px;color:#666;display:flex;justify-content:space-between;margin-top:8px}
+.now{font-size:44px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.why{font-size:32px;color:#333;line-height:1.4;margin-bottom:8px}
 .li{font-size:34px;line-height:1.5;display:flex;gap:16px}
+.now+.li,.why+.li{margin-top:16px}
 .li .cb{width:34px;height:34px;border:4px solid #000;flex:none;margin-top:12px}
 .li .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
 """
@@ -194,6 +197,8 @@ def tfc():
     bars = "".join(f'<div class="c"><div class="n">{v}</div><div class="b" style="height:{round(v/mx*300)}px"></div></div>' for v in TFC["series"])
     T = lambda v, l, s="", cls="": f'<div class="tile {cls}"><div class="v">{v}</div><div class="l">{l}</div><div class="s">{s}</div></div>'
     acts = "".join(f'<div class="li"><span class="cb"></span><span>{a}</span><span class="due">{d}</span></div>' for a, d in TFC["actions"])
+    notes = [re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", n) for n in sources.NOTES.get("TFC", [])]
+    now = (f'<div class="now">{notes[0]}</div>' + "".join(f'<div class="why">{n}</div>' for n in notes[1:])) if notes else ""
     ends = "".join(f'<div class="li"><span>{n}</span><span class="due">{d}</span></div>' for n, d in TFC["ending"])
     return ('<div class="col">' + f'<div class="hdr"><div class="brand">{LOGO}<span class="w">THE FINAL COUNTDOWN</span></div><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div>'
         f'<div class="hero"><div class="v">{days}</div><div class="l">days to FANZCA written<br>{exam_txt}</div></div>'
@@ -208,7 +213,7 @@ def tfc():
         f'<div class="row2"><div class="box"><div class="l">Daily active users, 14 days<span>peak {mx}</span></div><div class="bars">{bars}</div>'
         f'<div class="x"><span>{(TODAY-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>'
         f'<div class="box"><div class="l">Trials ending this fortnight</div>{ends}</div></div>'
-        f'<div class="box grow" style="margin-top:28px"><div class="l">TFC to-do</div>{acts}</div></div>')
+        f'<div class="box grow" style="margin-top:28px"><div class="l">Now</div>{now}{acts}</div></div>')
 
 PRI = sources.priorities()
 CSS_PRI = """
