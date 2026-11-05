@@ -7,25 +7,9 @@
  },
  "acts": [
   {
-   "n": "Meriden Swimming",
-   "day": 2,
-   "band": 0,
-   "kids": "L",
-   "term": null,
-   "pdf": null
-  },
-  {
-   "n": "Meriden Swimming",
-   "day": 3,
-   "band": 0,
-   "kids": "L",
-   "term": null,
-   "pdf": null
-  },
-  {
-   "n": "Meriden Swimming",
-   "day": 4,
-   "band": 0,
+   "n": "Writing Club",
+   "day": 0,
+   "band": 1,
    "kids": "L",
    "term": null,
    "pdf": null
@@ -35,9 +19,9 @@
    "day": 0,
    "band": 2,
    "kids": "L",
-   "lift": 1,
    "term": 236.67,
    "pdf": null,
+   "lift": 1,
    "t": "4:30-5:15"
   },
   {
@@ -45,42 +29,15 @@
    "day": 0,
    "band": 2,
    "kids": "HE",
-   "lift": 1,
    "term": 236.67,
    "pdf": null,
+   "lift": 1,
    "t": "4:45-5:15"
   },
   {
-   "n": "BJJ",
-   "day": 5,
-   "band": 0,
-   "kids": "E",
-   "lift": 1,
-   "term": null,
-   "pdf": null
-  },
-  {
-   "n": "Just Football",
-   "day": 6,
-   "band": 0,
-   "kids": "LE",
-   "lift": 1,
-   "term": null,
-   "pdf": null
-  },
-  {
-   "n": "Swimming",
+   "n": "Football",
    "day": 1,
-   "band": 2,
-   "kids": "HE",
-   "lift": 1,
-   "term": null,
-   "pdf": null
-  },
-  {
-   "n": "Writing",
-   "day": 0,
-   "band": 1,
+   "band": 0,
    "kids": "L",
    "term": null,
    "pdf": null
@@ -94,32 +51,6 @@
    "pdf": null
   },
   {
-   "n": "Unboxing Jesus / book club",
-   "day": 3,
-   "band": 1,
-   "kids": "L",
-   "term": null,
-   "pdf": null
-  },
-  {
-   "n": "Piano",
-   "day": 0,
-   "band": 2,
-   "kids": "L",
-   "lift": 1,
-   "term": null,
-   "pdf": null
-  },
-  {
-   "n": "Debating",
-   "day": 0,
-   "band": 2,
-   "kids": "L",
-   "maybe": 1,
-   "term": null,
-   "pdf": null
-  },
-  {
    "n": "Tech Club",
    "day": 1,
    "band": 2,
@@ -128,20 +59,35 @@
    "pdf": null
   },
   {
-   "n": "Debate",
+   "n": "Meriden Swimming",
    "day": 2,
-   "band": 2,
+   "band": 0,
    "kids": "L",
-   "lift": 1,
    "term": null,
    "pdf": null
   },
   {
-   "n": "Cadets",
+   "n": "Meriden Swimming",
+   "day": 3,
+   "band": 0,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Regate",
    "day": 2,
    "band": 2,
    "kids": "L",
-   "maybe": 1,
+   "term": null,
+   "pdf": null,
+   "lift": 1
+  },
+  {
+   "n": "Unboxing Jesus",
+   "day": 3,
+   "band": 1,
+   "kids": "L",
    "term": null,
    "pdf": null
   },
@@ -149,19 +95,19 @@
    "n": "BJJ",
    "day": 3,
    "band": 2,
-   "kids": "E",
-   "lift": 1,
+   "kids": "LHE",
    "term": null,
-   "pdf": null
+   "pdf": null,
+   "lift": 1
   },
   {
-   "n": "Football (T2-3)",
-   "day": 5,
-   "band": 2,
-   "kids": "L",
-   "lift": 1,
+   "n": "Just Football",
+   "day": 6,
+   "band": 0,
+   "kids": "LE",
    "term": null,
-   "pdf": null
+   "pdf": null,
+   "lift": 1
   }
  ]
 }
