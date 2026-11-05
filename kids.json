@@ -7,6 +7,15 @@
  },
  "acts": [
   {
+   "n": "MLC Swimming",
+   "day": 0,
+   "band": 2,
+   "kids": "LHE",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
    "n": "Swimming",
    "day": 2,
    "band": 0,
