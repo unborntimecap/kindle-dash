@@ -43,6 +43,14 @@
    "pdf": null
   },
   {
+   "n": "Football",
+   "day": 3,
+   "band": 0,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
    "n": "Fab Lab",
    "day": 1,
    "band": 1,
@@ -68,7 +76,7 @@
   },
   {
    "n": "Meriden Swimming",
-   "day": 3,
+   "day": 4,
    "band": 0,
    "kids": "L",
    "term": null,
