@@ -134,6 +134,15 @@
    "term": null,
    "t": "7:00-9:00 pm",
    "lift": 1
+  },
+  {
+   "n": "IGSA Football (T2-3)",
+   "day": 5,
+   "band": 0,
+   "kids": "L",
+   "term": null,
+   "t": "Sat match, placeholder",
+   "maybe": 1
   }
  ]
 }
