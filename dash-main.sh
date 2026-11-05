@@ -1,6 +1,6 @@
 #!/bin/sh
 # kindle-dash v2.0. Tap this "book" to enter dashboard mode.
-# Footer tabs: Agenda | TFC | Priorities | Kids | Kindle (exit). Kids header button cycles All > Leah > Harper > Elijah. Header buttons on calendar pages: [Month/Week] [Next/Back].
+# Footer tabs: Agenda | TFC | Priorities | Fam | Kindle (exit). Fam header button cycles All > Leah > Harper > Elijah. Header buttons on calendar pages: [Month/Week] [Next/Back].
 # Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
 

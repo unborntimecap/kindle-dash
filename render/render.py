@@ -314,13 +314,13 @@ def priorities():
     return f'<div class="hdr"><h1>Priorities</h1><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div><div class="body">{body}</div>'
 
 def nav(cur):
-    return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Kids","Kindle"]) + '</div>'
+    return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Fam","Kindle"]) + '</div>'
 
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(); pg = await b.new_page(viewport={"width": 1860, "height": 2480})
         for name, fn in [("agenda", agenda), ("agenda-next", agenda_next), ("month", month), ("month-next", month_next), ("tfc", tfc), ("priorities", priorities), ("kids", kids)] + [(f"kids-{k.lower()}", (lambda k=k: kids(k))) for k in KIDS["kids"]]:
-            cur = {"agenda":"Agenda","agenda-next":"Agenda","daily":"Agenda","month":"Agenda","month-next":"Agenda","tfc":"TFC","priorities":"Priorities"}.get(name, "Kids")
+            cur = {"agenda":"Agenda","agenda-next":"Agenda","daily":"Agenda","month":"Agenda","month-next":"Agenda","tfc":"TFC","priorities":"Priorities"}.get(name, "Fam")
             doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}{CSS_PRI}{CSS_KIDS}</style></head><body>{fn()}{nav(cur)}</body></html>"
             
             await pg.set_content(doc); await pg.screenshot(path=str(OUT / f"{name}.png"))
