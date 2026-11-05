@@ -1,5 +1,5 @@
 {
- "_note": "Kids page. kids: L Leah, H Harper, E Elijah. day 0=Mon..6=Sun. band 0 morning, 1 lunch, 2 after school. lift: someone drives. maybe: undecided. term: cost per child per term in AUD, null = not known yet. pdf: link to the info sheet (web page only). t: time, optional. Costs per child per term: MLC $71/wk x10 for three; Meriden swim and football $160/term for two sessions ($80 each); Tech Club $100/yr.",
+ "_note": "Kids page. kids: L Leah, H Harper, E Elijah. day 0=Mon..6=Sun. band 0 morning, 1 lunch, 2 after school. lift: someone drives. maybe: undecided. term: cost per child per term in AUD, null = not known yet. pdf: link to the info sheet (web page only). t: time, optional. Costs per child per term: MLC $71/wk x10 for three; Meriden swim and football $160/term for two sessions ($80 each); Tech Club $100/yr. Regate $500/term. BJJ $80/wk for three x10 = $800/term, split across Thu and Sat.",
  "kids": {
   "L": "Leah",
   "H": "Harper",
@@ -94,7 +94,7 @@
    "day": 2,
    "band": 2,
    "kids": "L",
-   "term": null,
+   "term": 500,
    "t": "5:30-7:00 Mason Park",
    "lift": 1,
    "pdf": "https://keidribbleacademy.com.au/"
@@ -111,7 +111,7 @@
    "day": 3,
    "band": 2,
    "kids": "LHE",
-   "term": null,
+   "term": 133.33,
    "t": "4:30 Kumite Concord",
    "lift": 1,
    "pdf": "https://kumitejiujitsu.squarespace.com/classes/kidsclasses"
@@ -121,7 +121,7 @@
    "day": 5,
    "band": 0,
    "kids": "LHE",
-   "term": null,
+   "term": 133.33,
    "t": "10:00 Kumite Concord",
    "lift": 1,
    "pdf": "https://kumitejiujitsu.squarespace.com/classes/kidsclasses"
