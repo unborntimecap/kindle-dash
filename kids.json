@@ -19,18 +19,9 @@
    "n": "MLC Swimming",
    "day": 0,
    "band": 2,
-   "kids": "L",
+   "kids": "LHE",
    "term": 236.67,
-   "t": "4:30-5:15",
-   "lift": 1
-  },
-  {
-   "n": "MLC Swimming",
-   "day": 0,
-   "band": 2,
-   "kids": "HE",
-   "term": 236.67,
-   "t": "4:45-5:15",
+   "t": "L 4:30, H E 4:45, to 5:15",
    "lift": 1
   },
   {
