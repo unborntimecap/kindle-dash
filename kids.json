@@ -1,5 +1,5 @@
 {
- "_note": "Kids page. kids: L Leah, H Harper, E Elijah. day 0=Mon..6=Sun. band 0 morning, 1 lunch, 2 after school. lift: someone drives. maybe: undecided. term: cost per child per term in AUD, null = not known yet. pdf: link to the info sheet (web page only). t: time, optional. MLC swimming: $71/week for all three, x10 weeks = $710/term, split per child.",
+ "_note": "Kids page. kids: L Leah, H Harper, E Elijah. day 0=Mon..6=Sun. band 0 morning, 1 lunch, 2 after school. lift: someone drives. maybe: undecided. term: cost per child per term in AUD, null = not known yet. pdf: link to the info sheet (web page only). t: time, optional. Costs per child per term: MLC $71/wk x10 for three; Meriden swim and football $160/term for two sessions ($80 each); Tech Club $100/yr.",
  "kids": {
   "L": "Leah",
   "H": "Harper",
@@ -11,8 +11,9 @@
    "day": 0,
    "band": 1,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": 0,
+   "t": "12:30-1:10",
+   "pdf": "pdf/Parent_Lounge_Writing_Group_Junior_2027.pdf"
   },
   {
    "n": "MLC Swimming",
@@ -20,9 +21,8 @@
    "band": 2,
    "kids": "L",
    "term": 236.67,
-   "pdf": null,
-   "lift": 1,
-   "t": "4:30-5:15"
+   "t": "4:30-5:15",
+   "lift": 1
   },
   {
    "n": "MLC Swimming",
@@ -30,57 +30,64 @@
    "band": 2,
    "kids": "HE",
    "term": 236.67,
-   "pdf": null,
-   "lift": 1,
-   "t": "4:45-5:15"
+   "t": "4:45-5:15",
+   "lift": 1
   },
   {
    "n": "Football",
    "day": 1,
    "band": 0,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": 80,
+   "t": "7:00-7:50 Strathfield Park",
+   "lift": 1,
+   "pdf": "pdf/Pre_Season_Football_T1_2027.pdf"
   },
   {
    "n": "Football",
    "day": 3,
    "band": 0,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": 80,
+   "t": "7:00-7:50 Strathfield Park",
+   "lift": 1,
+   "pdf": "pdf/Pre_Season_Football_T1_2027.pdf"
   },
   {
    "n": "Fab Lab",
    "day": 1,
    "band": 1,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": 0,
+   "t": "12:30-1:10",
+   "pdf": "pdf/Parent_Lounge_FabLab_2027.pdf"
   },
   {
    "n": "Tech Club",
    "day": 1,
    "band": 2,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": 25,
+   "t": "3:30-5:00",
+   "pdf": "pdf/Parent_Lounge_Tech_Club_2027.pdf"
   },
   {
    "n": "Meriden Swimming",
    "day": 2,
    "band": 0,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": 80,
+   "t": "7:00-8:00",
+   "pdf": "pdf/Swim_Fitness_T1_2027.pdf"
   },
   {
    "n": "Meriden Swimming",
    "day": 4,
    "band": 0,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": 80,
+   "t": "7:00-8:00",
+   "pdf": "pdf/Swim_Fitness_T1_2027.pdf"
   },
   {
    "n": "Regate",
@@ -88,16 +95,16 @@
    "band": 2,
    "kids": "L",
    "term": null,
-   "pdf": null,
-   "lift": 1
+   "t": "5:30-7:00 Mason Park",
+   "lift": 1,
+   "pdf": "https://keidribbleacademy.com.au/"
   },
   {
    "n": "Unboxing Jesus",
    "day": 3,
    "band": 1,
    "kids": "L",
-   "term": null,
-   "pdf": null
+   "term": null
   },
   {
    "n": "BJJ",
@@ -105,27 +112,37 @@
    "band": 2,
    "kids": "LHE",
    "term": null,
-   "pdf": null,
-   "lift": 1
+   "t": "4:30 Kumite Concord",
+   "lift": 1,
+   "pdf": "https://kumitejiujitsu.squarespace.com/classes/kidsclasses"
   },
   {
    "n": "BJJ",
    "day": 5,
    "band": 0,
    "kids": "LHE",
-   "lift": 1,
    "term": null,
-   "pdf": null
+   "t": "10:00 Kumite Concord",
+   "lift": 1,
+   "pdf": "https://kumitejiujitsu.squarespace.com/classes/kidsclasses"
   },
   {
    "n": "Just Football",
    "day": 6,
    "band": 2,
    "kids": "LHE",
-   "lift": 1,
-   "t": "5:30-7:00",
    "term": null,
-   "pdf": null
+   "t": "5:30-7:00",
+   "lift": 1
+  },
+  {
+   "n": "Youth Group",
+   "day": 4,
+   "band": 2,
+   "kids": "L",
+   "term": null,
+   "t": "7:00-9:00 pm",
+   "lift": 1
   }
  ]
 }
