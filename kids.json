@@ -1,5 +1,5 @@
 {
- "_note": "Kids page. kids: L Leah, H Harper, E Elijah. day 0=Mon..6=Sun. band 0 morning, 1 lunch, 2 after school. lift: someone drives. maybe: undecided. term: cost per child per term in AUD, null = not known yet. pdf: link to the info sheet (web page only). t: time, optional.",
+ "_note": "Kids page. kids: L Leah, H Harper, E Elijah. day 0=Mon..6=Sun. band 0 morning, 1 lunch, 2 after school. lift: someone drives. maybe: undecided. term: cost per child per term in AUD, null = not known yet. pdf: link to the info sheet (web page only). t: time, optional. MLC swimming: $71/week for all three, x10 weeks = $710/term, split per child.",
  "kids": {
   "L": "Leah",
   "H": "Harper",
@@ -36,7 +36,7 @@
    "band": 2,
    "kids": "L",
    "lift": 1,
-   "term": null,
+   "term": 236.67,
    "pdf": null,
    "t": "4:30-5:15"
   },
@@ -46,7 +46,7 @@
    "band": 2,
    "kids": "HE",
    "lift": 1,
-   "term": null,
+   "term": 236.67,
    "pdf": null,
    "t": "4:45-5:15"
   },

@@ -285,9 +285,9 @@ def kids(who=None):
         seen[key] = 1
         c = a.get("term")
         if c is None: unk += 1; val = "?"
-        else: tot += c * len(ks); val = f"${c*len(ks):,}"
+        else: tot += c * len(ks); val = f"${round(c*len(ks)):,}"
         rows += f'<div class="r"><span>{html.escape(a["n"])} ({"".join(ks)})</span><span>{val}</span></div>'
-    rows += f'<div class="r tot"><span>Per term{f" + {unk} unpriced" if unk else ""}</span><span>${tot:,}</span></div>'
+    rows += f'<div class="r tot"><span>Per term{f" + {unk} unpriced" if unk else ""}</span><span>${round(tot):,}</span></div>'
     order = [None] + list(KIDS["kids"])
     nxt = order[(order.index(who) + 1) % len(order)]
     label = "All" if who is None else KIDS["kids"][who]
