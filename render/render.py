@@ -267,7 +267,8 @@ def kids(who=None):
             g += "<div>" + "".join(
                 f'<div class="ka{" maybe" if a.get("maybe") else ""}">{html.escape(a["n"])}' + (f'<div class="t" style="font-size:26px;margin-top:4px">{a["t"]}</div>' if a.get("t") else "") + '<div class="who">'
                 + "".join(f'<span class="k">{k}</span>' for k in a["kids"] if who is None or k == who)
-                + ('<span class="t">LIFT</span>' if a.get("lift") else "") + ('<span class="t">MAYBE</span>' if a.get("maybe") else "")
+                + ('<span class="t">LIFT</span>' if a.get("lift") else "")
+                + (f'<span class="t">${round(a["term"]*len([k for k in a["kids"] if who is None or k == who])):,}/TERM</span>' if a.get("term") else "") + ('<span class="t">MAYBE</span>' if a.get("maybe") else "")
                 + "</div></div>" for a in acts if a["day"] == d and a["band"] == b) + "</div>"
     tiles = ""
     for k, name in KIDS["kids"].items():
