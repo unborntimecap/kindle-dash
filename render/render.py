@@ -238,6 +238,62 @@ def tfc():
         f'<div class="x"><span>{(TODAY-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>'
         f'<div class="box grow" style="margin-top:28px"><div class="l">Now</div>{now}{acts}</div></div>')
 
+
+KIDS = json.loads((HERE.parent / "kids.json").read_text())
+CSS_KIDS = """
+.kg{display:grid;grid-template-columns:150px repeat(7,1fr);border-top:5px solid #000;border-left:3px solid #bbb}
+.kg>div{border-right:3px solid #bbb;border-bottom:3px solid #bbb;padding:12px;display:flex;flex-direction:column;gap:12px;min-height:330px}
+.kg .kh{min-height:0;font-size:36px;font-weight:700;text-align:center;border-bottom:5px solid #000}
+.kg .kb{font-size:32px;font-weight:700;color:#444;justify-content:center}
+.ka{border:4px solid #000;padding:10px 12px;font-size:30px;line-height:1.2}
+.ka.maybe{border-style:dashed;color:#555}
+.ka .who{display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.ka .k{width:44px;height:44px;border-radius:50%;background:#000;color:#fff;font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ka .t{font-size:24px;color:#555;letter-spacing:1px}
+.kt{display:flex;gap:28px;margin-top:30px}
+.kt .tile{flex:1;padding:24px 28px}
+.kt .tile .v{font-size:96px}
+.kc{border:5px solid #000;padding:20px 28px;margin-top:30px;columns:2;column-gap:60px}
+.kc .r{display:flex;font-size:30px;line-height:1.5;break-inside:avoid}
+.kc .r span:last-child{margin-left:auto;font-variant-numeric:tabular-nums}
+.kc .tot{font-weight:700;border-top:4px solid #000;margin-top:6px}
+"""
+def kids(who=None):
+    acts = [a for a in KIDS["acts"] if who is None or who in a["kids"]]
+    g = '<div class="kh"></div>' + "".join(f'<div class="kh">{d}</div>' for d in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])
+    for b, band in enumerate(["Morning", "Lunch", "After school"]):
+        g += f'<div class="kb">{band}</div>'
+        for d in range(7):
+            g += "<div>" + "".join(
+                f'<div class="ka{" maybe" if a.get("maybe") else ""}">{html.escape(a["n"])}<div class="who">'
+                + "".join(f'<span class="k">{k}</span>' for k in a["kids"] if who is None or k == who)
+                + ('<span class="t">LIFT</span>' if a.get("lift") else "") + ('<span class="t">MAYBE</span>' if a.get("maybe") else "")
+                + "</div></div>" for a in acts if a["day"] == d and a["band"] == b) + "</div>"
+    tiles = ""
+    for k, name in KIDS["kids"].items():
+        if who and k != who: continue
+        firm = [a for a in KIDS["acts"] if k in a["kids"] and not a.get("maybe")]
+        tiles += (f'<div class="tile"><div class="v">{len(firm)}</div><div class="l">{name}: sessions</div>'
+                  f'<div class="s">{sum(1 for a in firm if a.get("lift"))} lifts · {sum(1 for a in KIDS["acts"] if k in a["kids"] and a.get("maybe"))} maybe</div></div>')
+    # term budget: cost per child per term x number of kids in it; unknown prices shown as "?"
+    rows, tot, unk = "", 0, 0
+    seen = {}
+    for a in acts:
+        ks = [k for k in a["kids"] if who is None or k == who]
+        key = (a["n"], "".join(ks))
+        if key in seen: continue
+        seen[key] = 1
+        c = a.get("term")
+        if c is None: unk += 1; val = "?"
+        else: tot += c * len(ks); val = f"${c*len(ks):,}"
+        rows += f'<div class="r"><span>{html.escape(a["n"])} ({"".join(ks)})</span><span>{val}</span></div>'
+    rows += f'<div class="r tot"><span>Per term{f" + {unk} unpriced" if unk else ""}</span><span>${tot:,}</span></div>'
+    order = [None] + list(KIDS["kids"])
+    nxt = order[(order.index(who) + 1) % len(order)]
+    label = "All" if who is None else KIDS["kids"][who]
+    return (hdr("Kids week", "L Leah · H Harper · E Elijah", f"Showing: {label}", f'{"All" if nxt is None else KIDS["kids"][nxt]} &rsaquo;')
+            + f'<div class="kg">{g}</div><div class="kt">{tiles}</div><div class="kc"><div class="r tot" style="border:0;margin:0"><span>Term budget</span></div>{rows}</div>')
+
 PRI = sources.priorities()
 CSS_PRI = """
 .sec{margin-top:30px}
@@ -258,14 +314,14 @@ def priorities():
     return f'<div class="hdr"><h1>Priorities</h1><div class="right"><div class="btns" style="visibility:hidden"><span class="btn">x</span></div><span class="sub">rendered {NOW}</span></div></div><div class="body">{body}</div>'
 
 def nav(cur):
-    return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Kindle"]) + '</div>'
+    return '<div class="nav">' + "".join(f'<div class="{"on" if n==cur else ""}">{n}</div>' for n in ["Agenda","TFC","Priorities","Kids","Kindle"]) + '</div>'
 
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(); pg = await b.new_page(viewport={"width": 1860, "height": 2480})
-        for name, fn in [("agenda", agenda), ("agenda-next", agenda_next), ("month", month), ("month-next", month_next), ("tfc", tfc), ("priorities", priorities)]:
-            cur = {"agenda":"Agenda","agenda-next":"Agenda","daily":"Agenda","month":"Agenda","month-next":"Agenda","tfc":"TFC","priorities":"Priorities"}[name]
-            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}{CSS_PRI}</style></head><body>{fn()}{nav(cur)}</body></html>"
+        for name, fn in [("agenda", agenda), ("agenda-next", agenda_next), ("month", month), ("month-next", month_next), ("tfc", tfc), ("priorities", priorities), ("kids", kids)] + [(f"kids-{k.lower()}", (lambda k=k: kids(k))) for k in KIDS["kids"]]:
+            cur = {"agenda":"Agenda","agenda-next":"Agenda","daily":"Agenda","month":"Agenda","month-next":"Agenda","tfc":"TFC","priorities":"Priorities"}.get(name, "Kids")
+            doc = f"<!doctype html><html><head><meta charset=utf-8><style>{CSS}{CSS_TFC}{CSS_PRI}{CSS_KIDS}</style></head><body>{fn()}{nav(cur)}</body></html>"
             
             await pg.set_content(doc); await pg.screenshot(path=str(OUT / f"{name}.png"))
             im = Image.open(OUT / f"{name}.png").convert("L").quantize(16).convert("L")

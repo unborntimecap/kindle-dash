@@ -1,11 +1,11 @@
 #!/bin/sh
 # kindle-dash v2.0. Tap this "book" to enter dashboard mode.
-# Footer tabs: Agenda | TFC | Priorities | Kindle (exit). Header buttons on calendar pages: [Month/Week] [Next/Back].
+# Footer tabs: Agenda | TFC | Priorities | Kids | Kindle (exit). Kids header button cycles All > Leah > Harper > Elijah. Header buttons on calendar pages: [Month/Week] [Next/Back].
 # Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
 
 BASE="https://raw.githubusercontent.com/unborntimecap/kindle-dash/render"
-PAGES="agenda agenda-next month month-next tfc priorities"
+PAGES="agenda agenda-next month month-next tfc priorities kids kids-l kids-h kids-e"
 REFRESH=1800
 D=/mnt/us
 LOG=$D/documents/dash-log.txt
@@ -76,9 +76,10 @@ while :; do
     57) [ "$3" = "4294967295" ] || continue   # ABS_MT_TRACKING_ID = -1 => finger up
         log "tap $X,$Y"
         if [ $Y -gt 2330 ]; then
-          if   [ $X -lt 465 ];  then show agenda
-          elif [ $X -lt 930 ];  then show tfc
-          elif [ $X -lt 1395 ]; then show priorities
+          if   [ $X -lt 372 ];  then show agenda
+          elif [ $X -lt 744 ];  then show tfc
+          elif [ $X -lt 1116 ]; then show priorities
+          elif [ $X -lt 1488 ]; then show kids
           else leave; fi
         elif [ $Y -lt 190 ] && [ $X -gt 1080 ]; then
           # header buttons on calendar pages: left = Month/Week toggle, right = Next/Back toggle
@@ -87,6 +88,10 @@ while :; do
             agenda-next) [ $X -gt 1450 ] && show agenda      || show month ;;
             month)       [ $X -gt 1450 ] && show month-next  || show agenda ;;
             month-next)  [ $X -gt 1450 ] && show month       || show agenda ;;
+            kids)   show kids-l ;;
+            kids-l) show kids-h ;;
+            kids-h) show kids-e ;;
+            kids-e) show kids ;;
             *) fetch $PAGE; show $PAGE ;;
           esac
         else

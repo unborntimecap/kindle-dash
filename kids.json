@@ -1,0 +1,139 @@
+{
+ "_note": "Kids page. kids: L Leah, H Harper, E Elijah. day 0=Mon..6=Sun. band 0 morning, 1 lunch, 2 after school. lift: someone drives. maybe: undecided. term: cost per child per term in AUD, null = not known yet. pdf: link to the info sheet (web page only).",
+ "kids": {
+  "L": "Leah",
+  "H": "Harper",
+  "E": "Elijah"
+ },
+ "acts": [
+  {
+   "n": "Swimming",
+   "day": 2,
+   "band": 0,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Swimming",
+   "day": 4,
+   "band": 0,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "BJJ",
+   "day": 5,
+   "band": 0,
+   "kids": "E",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Just Football",
+   "day": 6,
+   "band": 0,
+   "kids": "LE",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Swimming",
+   "day": 1,
+   "band": 2,
+   "kids": "HE",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Writing",
+   "day": 0,
+   "band": 1,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Fab Lab",
+   "day": 1,
+   "band": 1,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Unboxing Jesus / book club",
+   "day": 3,
+   "band": 1,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Piano",
+   "day": 0,
+   "band": 2,
+   "kids": "L",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Debating",
+   "day": 0,
+   "band": 2,
+   "kids": "L",
+   "maybe": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Tech Club",
+   "day": 1,
+   "band": 2,
+   "kids": "L",
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Debate",
+   "day": 2,
+   "band": 2,
+   "kids": "L",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Cadets",
+   "day": 2,
+   "band": 2,
+   "kids": "L",
+   "maybe": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "BJJ",
+   "day": 3,
+   "band": 2,
+   "kids": "E",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
+   "n": "Football (T2-3)",
+   "day": 5,
+   "band": 2,
+   "kids": "L",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  }
+ ]
+}
