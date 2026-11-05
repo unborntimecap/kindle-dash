@@ -101,13 +101,23 @@
    "lift": 1
   },
   {
+   "n": "BJJ",
+   "day": 5,
+   "band": 0,
+   "kids": "LHE",
+   "lift": 1,
+   "term": null,
+   "pdf": null
+  },
+  {
    "n": "Just Football",
    "day": 6,
-   "band": 0,
-   "kids": "LE",
+   "band": 2,
+   "kids": "LHE",
+   "lift": 1,
+   "t": "5:30-7:00",
    "term": null,
-   "pdf": null,
-   "lift": 1
+   "pdf": null
   }
  ]
 }
