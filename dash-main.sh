@@ -48,10 +48,34 @@ show() {  # $1 = page name
   log "shown $1"
 }
 
+
+# --- screensaver: paint the TFC page whenever the Kindle goes to sleep ---
+# Runs as its own background process ("sh dash-main.sh saver"), started on every dashboard launch.
+# Turn off: put a file named saver-off.txt in documents, then reboot.
+if [ "$1" = saver ]; then
+  echo $$ > $D/dash-saver.pid; log "saver: watching"
+  lipc-wait-event -m com.lab126.powerd goingToScreenSaver,outOfScreenSaver | while read ev rest; do
+    case "$ev" in
+      goingToScreenSaver) sleep 2; [ -s $D/dash-tfc.png ] && eips -f -g $D/dash-tfc.png && log "saver: painted tfc" ;;
+      outOfScreenSaver)   ( wifi_up 90 && get tfc ) & ;;   # refresh the copy for next sleep
+    esac
+  done
+  exit 0
+fi
+
+start_saver() {  # (re)start the watcher so it always runs the latest script
+  [ -s $D/dash-saver.pid ] && kill -- -$(cat $D/dash-saver.pid) 2>/dev/null
+  rm -f $D/dash-saver.pid
+  [ -e $D/documents/saver-off.txt ] && { log "saver: off"; return; }
+  if command -v setsid >/dev/null; then setsid sh $D/dash-main.sh saver </dev/null >>$LOG 2>&1 &
+  else sh $D/dash-main.sh saver </dev/null >>$LOG 2>&1 & fi
+}
+
 enter() {
   log "=== enter dashboard ==="
   lipc-set-prop com.lab126.powerd preventScreenSaver 1 2>/dev/null
   killall -STOP framework 2>/dev/null
+  start_saver
   show agenda                 # paint cached copy straight away (no black screen)
   fetch_all; show agenda      # repaint: fresh pages, or OLD COPY stamp if offline
   # background refresher
