@@ -1,5 +1,5 @@
 #!/bin/sh
-# kindle-dash v2.0. Tap this "book" to enter dashboard mode.
+# kindle-dash v2.1. Tap this "book" to enter dashboard mode.
 # Footer tabs: Agenda | TFC | Priorities | Fam | Kindle (exit). Fam header button cycles All > Leah > Harper > Elijah. Header buttons on calendar pages: [Month/Week] [Next/Back].
 # Tap anywhere else to refresh.
 # Pages refresh every REFRESH seconds. Log: documents/dash-log.txt
@@ -15,26 +15,36 @@ exec >>$LOG 2>&1   # keep eips/curl chatter off the screen
 
 log() { echo "$(date '+%H:%M:%S') $*" >> $LOG; }
 
-wifi_up() {
+wifi_up() {  # $1 = max seconds to wait; Kindle Wi-Fi takes ~60 s to come back from sleep
   lipc-set-prop com.lab126.cmd wirelessEnable 1 2>/dev/null
-  i=0; while [ $i -lt 20 ]; do
+  i=0; while [ $i -lt ${1:-30} ]; do
     ping -c1 -W2 1.1.1.1 >/dev/null 2>&1 && return 0
     sleep 1; i=$((i+1))
   done; return 1
 }
 
-fetch() {  # $1 = page name; keeps last good copy on failure
-  wifi_up || { log "wifi down, keeping cached $1"; return 1; }
+get() {  # $1 = page name; download only. On failure keep last good copy and mark it old
   curl -fsSL -m 30 -o $D/dash-$1.new "$BASE/$1.png?t=$(date +%s)" \
-    && mv $D/dash-$1.new $D/dash-$1.png && log "fetched $1" \
-    || { rm -f $D/dash-$1.new; log "fetch $1 failed"; return 1; }
+    && mv $D/dash-$1.new $D/dash-$1.png && rm -f $D/dash-$1.old && log "fetched $1" \
+    || { rm -f $D/dash-$1.new; : > $D/dash-$1.old; log "fetch $1 failed"; return 1; }
+}
+
+fetch() {  # $1 = page name
+  wifi_up 30 || { : > $D/dash-$1.old; log "wifi down, keeping cached $1"; return 1; }
+  get $1
+}
+
+fetch_all() {  # wake Wi-Fi once (long wait), then pull every page
+  wifi_up 90 || { for p in $PAGES; do : > $D/dash-$p.old; done; log "wifi down, all pages cached"; return 1; }
+  for p in $PAGES; do get $p; done
 }
 
 show() {  # $1 = page name
   PAGE=$1
   [ -s $D/dash-$1.png ] || fetch $1 || return 1
   eips -f -g $D/dash-$1.png
-  eips 36 7 "fetched $(date +%H:%M)"   # char cells ~17x24 px; row 7 = the "rendered" line (y 167-195 on every page)
+  if [ -e $D/dash-$1.old ]; then eips 36 7 "OLD COPY - offline $(date +%H:%M)"
+  else eips 36 7 "fetched $(date +%H:%M)"; fi   # char cells ~17x24 px; row 7 = the "rendered" line (y 167-195 on every page)
   log "shown $1"
 }
 
@@ -42,10 +52,10 @@ enter() {
   log "=== enter dashboard ==="
   lipc-set-prop com.lab126.powerd preventScreenSaver 1 2>/dev/null
   killall -STOP framework 2>/dev/null
-  for p in $PAGES; do fetch $p; done
-  show agenda
+  show agenda                 # paint cached copy straight away (no black screen)
+  fetch_all; show agenda      # repaint: fresh pages, or OLD COPY stamp if offline
   # background refresher
-  ( while sleep $REFRESH; do for p in $PAGES; do fetch $p; done; show $PAGE; done ) &
+  ( while sleep $REFRESH; do fetch_all; show $PAGE; done ) &
   REFRESHER=$!
 }
 
