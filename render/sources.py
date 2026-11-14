@@ -136,6 +136,15 @@ def tfc():
     d["ending"] = [(x["name"], x["date"], x.get("checkout", False)) for x in d.get("ending", [])]
     return d
 
+def tfc_actions():  # Action list: things to do today (Supabase RPC kindle_actions)
+    url, key = os.environ.get("SUPABASE_URL", "https://oxkdndtmcjrthkehztos.supabase.co"), os.environ.get("SUPABASE_SERVICE_KEY")
+    def fetch():
+        if not key: raise RuntimeError("SUPABASE_SERVICE_KEY not set")
+        r = requests.post(f"{url}/rest/v1/rpc/kindle_actions", headers={"apikey": key, "Authorization": f"Bearer {key}"}, json={}, timeout=30)
+        r.raise_for_status(); return r.text
+    text = _cached("actions.json", fetch)
+    return json.loads(text) if text else None
+
 def hide_list():
     return [l.strip().lower() for l in (ROOT / "hide.txt").read_text().splitlines() if l.strip() and not l.startswith("#")]
 

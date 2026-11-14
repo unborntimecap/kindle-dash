@@ -198,7 +198,25 @@ CSS_TFC = """
 .now+.li,.why+.li{margin-top:16px}
 .li .cb{width:34px;height:34px;border:4px solid #000;flex:none;margin-top:12px}
 .li .due{margin-left:auto;color:#666;white-space:nowrap;padding-left:20px}
+.act{font-size:34px;line-height:1.45;display:flex;gap:18px;margin-bottom:6px}
+.act b{width:190px;flex:none}
 """
+
+def action_lines():
+    """One line per thing to do today. Lines with nothing to show are dropped."""
+    A = sources.tfc_actions()
+    if A is None: return '<div class="li dim">actions unavailable</div>'
+    e = html.escape; out = []
+    for x in A.get("ending", []):   out.append(("Nudge", f'{e(x["name"])}: trial ends {x["date"]}'))
+    for x in A.get("paywall", []):  out.append(("Win back", f'{e(x["name"])}: hit the paywall {x["seen"]}'))
+    st = A.get("stalled", [])
+    if st:
+        seen = [f'{e(x["name"])} ({x["seen"]})' for x in st if x["seen"] != "never"]
+        never = sum(1 for x in st if x["seen"] == "never")
+        out.append(("Check in", ", ".join(seen + ([f"{never} never opened"] if never else []))))
+    if A.get("flags"): out.append(("Fix", f'{A["flags"]} open SAQ flag{"s" if A["flags"] != 1 else ""}'))
+    for x in A.get("abandoned", []): out.append(("Review", f'{x["ref"]} {e(x["topic"] or "")}: {x["ab"]} of {x["started"]} didn\'t finish'))
+    return "".join(f'<div class="act"><b>{v}</b><span>{t}</span></div>' for v, t in out[:9]) or '<div class="li dim">Nothing needs doing today</div>'
 def tfc():
     TFC["actions"] = dict(PRI).get("TFC") or dict(sources.repo_priorities()).get("TFC", [])
     days = (TFC["exam"] - TODAY).days if TFC["exam"] else "–"
@@ -234,8 +252,7 @@ def tfc():
         + '</div>'
         f'<div class="row2"><div class="box"><div class="l">Paying by sitting<span>{TFC["paying"]}</span></div>{sitting}</div>'
         f'<div class="box"><div class="l">On trial<span>{TFC["trial_live"]} live · {TFC["trial_lapsed"]} lapsed</span></div>{ends}<div class="x" style="justify-content:flex-start;gap:12px;margin-top:12px"><span class="cb on" style="display:inline-block;width:24px;height:24px;border:3px solid #000;background:#000"></span>started checkout</div></div></div>'
-        f'<div class="box" style="margin-top:28px"><div class="l">Daily active users, 14 days<span>peak {mx}</span></div><div class="bars">{bars}</div>'
-        f'<div class="x"><span>{(TODAY-dt.timedelta(13)).strftime("%-d %b")}</span><span>today</span></div></div>'
+        f'<div class="box" style="margin-top:28px"><div class="l">Action list<span>today</span></div>{action_lines()}</div>'
         f'<div class="box grow" style="margin-top:28px"><div class="l">Now</div>{now}{acts}</div></div>')
 
 
