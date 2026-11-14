@@ -44,7 +44,7 @@ h1{font-size:64px;font-weight:700;letter-spacing:-1px}
 .nav .on{background:#000;color:#fff}
 .btns{display:flex;gap:18px}
 .btn{border:5px solid #000;padding:14px 30px;font-size:36px;font-weight:700;min-width:300px;text-align:center}
-.hdr .right{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;height:140px}
+.hdr .right{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:16px;height:140px}
 .body{height:2000px;overflow:hidden}
 .foot{position:absolute;bottom:60px;right:70px;font-size:28px;color:#888}
 /* daily */
