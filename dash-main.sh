@@ -16,11 +16,16 @@ exec >>$LOG 2>&1   # keep eips/curl chatter off the screen
 log() { echo "$(date '+%H:%M:%S') $*" >> $LOG; }
 
 wifi_up() {  # $1 = max seconds to wait; Kindle Wi-Fi takes ~60 s to come back from sleep
+  ping -c1 -W2 1.1.1.1 >/dev/null 2>&1 && return 0
+  eips 1 1 "connecting to Wi-Fi..."
   lipc-set-prop com.lab126.cmd wirelessEnable 1 2>/dev/null
+  lipc-set-prop com.lab126.wifid enable 1 2>/dev/null
   i=0; while [ $i -lt ${1:-30} ]; do
-    ping -c1 -W2 1.1.1.1 >/dev/null 2>&1 && return 0
+    ping -c1 -W2 1.1.1.1 >/dev/null 2>&1 && { eips 1 1 "                      "; return 0; }
+    # no luck after 15 s: switch Wi-Fi off and on, same as the toggle in Settings
+    [ $i -eq 15 ] && { log "wifi: toggling off/on"; lipc-set-prop com.lab126.cmd wirelessEnable 0 2>/dev/null; sleep 2; lipc-set-prop com.lab126.cmd wirelessEnable 1 2>/dev/null; }
     sleep 1; i=$((i+1))
-  done; return 1
+  done; eips 1 1 "Wi-Fi not connected  "; return 1
 }
 
 get() {  # $1 = page name; download only. On failure keep last good copy and mark it old
